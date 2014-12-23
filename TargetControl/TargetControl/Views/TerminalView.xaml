@@ -34,7 +34,7 @@
                  Grid.Column="0"
                  Height="20"
                  VerticalAlignment="Bottom"
-                 Controls:TextboxHelper.Watermark="Type Here Dummy"
+                 Controls:TextBoxHelper.Watermark="Type Here Dummy"
                  Name="terminalInputText"
                  KeyUp="terminalInputText_KeyUp"/>
     </Grid>
