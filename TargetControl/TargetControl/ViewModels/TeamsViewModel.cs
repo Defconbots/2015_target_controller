@@ -6,16 +6,20 @@ using System.Threading.Tasks;
 
 using Caliburn.Micro;
 
+using MahApps.Metro.Controls;
+
 using TargetControl.Models;
 
 namespace TargetControl
 {
     public sealed class TeamsViewModel : Screen, IMainScreenTabItem
     {
+        private readonly IEventAggregator _eventAggregator;
         public BindableCollection<Team> Teams { get; set; }
 
-        public TeamsViewModel()
+        public TeamsViewModel(IEventAggregator eventAggregator)
         {
+            _eventAggregator = eventAggregator;
             DisplayName = "Teams";
 
             Teams = new BindableCollection<Team>
@@ -38,6 +42,35 @@ namespace TargetControl
 
         public void AddTeam()
         {
+            _eventAggregator.PublishOnUIThread(new ShowFlyoutEvent
+            {
+                ViewModel = new AddTeamViewModel(AddTeamFinal),
+                Position = Position.Left
+            });
+        }
+
+        public void RemoveTeam(Team team)
+        {
+            Teams.Remove(team);
+        }
+
+        public void AddTeamFinal(AddTeamViewModel teamVM)
+        {
+            var team = new Team
+            {
+                Name = teamVM.TeamName,
+                Members = teamVM.Members.Select(x => new TeamMember
+                {
+                    Name = x.Name,
+                }).ToList()
+            };
+            Teams.Add(team);
+
+            _eventAggregator.PublishOnUIThread(new RemoveFlyoutEvent
+            {
+                ViewModel = teamVM,
+            });
         }
     }
+
 }
