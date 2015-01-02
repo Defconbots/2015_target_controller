@@ -44,6 +44,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MahApps.Metro.1.0.0.0\lib\net45\MahApps.Metro.dll</HintPath>
     </Reference>
+    <Reference Include="PInvokeSerialPort">
+      <HintPath>..\packages\PInvokeSerialPort.1.0.0\lib\PInvokeSerialPort.dll</HintPath>
+    </Reference>
     <Reference Include="SimpleInjector">
       <HintPath>..\packages\SimpleInjector.2.6.1\lib\net45\SimpleInjector.dll</HintPath>
     </Reference>
@@ -74,6 +77,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppBootstrapper.cs" />
+    <Compile Include="Models\SerialCommandInterface.cs" />
+    <Compile Include="Models\SerialPacketParser.cs" />
+    <Compile Include="Models\SerialPortSerial.cs" />
     <Compile Include="ViewModels\ContestViewModel.cs" />
     <Compile Include="ViewModels\ManualControlViewModel.cs" />
     <Compile Include="ViewModels\ShellViewModel.cs" />
