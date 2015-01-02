@@ -12,7 +12,7 @@ using SimpleInjector;
 
 namespace TargetControl
 {
-    class AppBootstrapper : BootstrapperBase
+    public class AppBootstrapper : BootstrapperBase
     {
         private Container _container = new Container();
 
@@ -25,6 +25,22 @@ namespace TargetControl
         {
             _container.Register<IWindowManager, WindowManager>();
             _container.RegisterSingle<IEventAggregator, EventAggregator>();
+
+            // stubs
+            var useStubs = Environment.GetCommandLineArgs().Contains("/stubs");
+            if (!useStubs)
+            {
+                _container.RegisterSingle<ISerialPortListProvider, SerialPortListProvider>();
+                _container.RegisterSingle<ISerial, SerialPortSerial>();
+            }
+            else
+            {
+                _container.RegisterSingle<ISerialPortListProvider, StubSerialPortListProvider>();
+                _container.RegisterSingle<ISerial, StubSerialPort>();
+            }
+
+            _container.RegisterSingle<ISerialPacketParser, SerialPacketParser>();
+            _container.RegisterSingle<ISerialCommandInterface, SerialCommandInterface>();
 
             _container.RegisterAll(typeof(IMainScreenTabItem), new[]
                 {

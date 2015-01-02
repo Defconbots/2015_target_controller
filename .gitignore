@@ -5,3 +5,5 @@
 obj/
 [Rr]elease*/
 _ReSharper*/
+*.crunchsolution.cache
+*.user

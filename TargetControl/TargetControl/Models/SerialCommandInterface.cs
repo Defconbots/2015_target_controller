@@ -6,7 +6,14 @@ using System.Threading.Tasks;
 
 namespace TargetControl
 {
-    public class SerialCommandInterface : ISerialPacketHandler
+    public interface ISerialCommandInterface
+    {
+        event Action<SCIReadData> DataReceived;
+        void Read(char address, char device);
+        void Write(char address, char device, char dataH, char dataL);
+    }
+
+    public class SerialCommandInterface : ISerialPacketHandler, ISerialCommandInterface
     {
         private ISerial _serial;
         private readonly ISerialPacketParser _serialParser;
