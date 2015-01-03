@@ -10,6 +10,7 @@ namespace TargetControl
         private readonly ISerialCommandInterface _serialInterface;
 
         private string _selectedSerialPort;
+        private string _voltage;
 
         public ManualControlViewModel(ISerialPortListProvider availableSerialPortsProvider,
             ISerial serialPort,
@@ -45,9 +46,24 @@ namespace TargetControl
             }
         }
 
+        public string Voltage
+        {
+            get { return _voltage; }
+            set
+            {
+                _voltage = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
         public void OpenSerialPort()
         {
             _serialPort.Open(SelectedAvailableSerialPort, 115200);
+        }
+
+        public void ReadVoltage()
+        {
+            _serialInterface.Read('0', 'V');
         }
 
         public void SetSpeed(string speed)
@@ -68,6 +84,11 @@ namespace TargetControl
             _serialInterface.Write(target.Address, 'B', '0', target.BlueLed ? '0' : '1');
         }
 
+        public void ReadHitId(ManualControlTargetViewModel target)
+        {
+            _serialInterface.Read(target.Address, 'I');
+        }
+
         private void OnSerialCommandDataReceived(SCIReadData data)
         {
             var target = Targets.FirstOrDefault(x => x.Address == data.Address);
@@ -81,6 +102,18 @@ namespace TargetControl
                 {
                     target.BlueLed = (data.DataL != '0');
                 }
+                else if (data.Device == 'I')
+                {
+                    target.HitId = string.Format("{0}{1}", data.DataH, data.DataL);
+                }
+            }
+
+            if (data.Address == '0')
+            {
+                if (data.Device == 'V')
+                {
+                    Voltage = string.Format("{0}{1}", data.DataH, data.DataL);
+                }
             }
         }
     }
@@ -90,6 +123,7 @@ namespace TargetControl
         private readonly char _address;
         private bool _redLed;
         private bool _blueLed;
+        private string _hitId;
 
         public ManualControlTargetViewModel(char address)
         {
@@ -117,6 +151,16 @@ namespace TargetControl
             set
             {
                 _blueLed = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
+        public string HitId
+        {
+            get { return _hitId; }
+            set
+            {
+                _hitId = value;
                 NotifyOfPropertyChange();
             }
         }

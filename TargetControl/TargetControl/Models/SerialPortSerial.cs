@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-using PInvokeSerialPort;
 
 namespace TargetControl
 {
@@ -43,11 +42,11 @@ namespace TargetControl
             _serialPort.Open();
         }
 
-        private void OnDataReceived(byte x)
+        private void OnDataReceived(object sender, SerialDataReceivedEventArgs serialDataReceivedEventArgs)
         {
             if (SerialDataReceived != null)
             {
-                SerialDataReceived(((char)x).ToString());
+                SerialDataReceived(_serialPort.ReadExisting());
             }
         }
     }
