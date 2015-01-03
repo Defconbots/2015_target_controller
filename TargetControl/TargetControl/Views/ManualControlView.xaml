@@ -4,61 +4,54 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:controls="clr-namespace:TargetControl.Controls"
              mc:Ignorable="d"
              d:DesignHeight="600" d:DesignWidth="800">
-    <Grid>
+    <StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <ComboBox x:Name="AvailableSerialPorts" Width="150" Margin="10"/>
+            <Button x:Name="OpenSerialPort" Width="100" Margin="10">Open</Button>
+        </StackPanel>
         <StackPanel Orientation="Horizontal">
             <StackPanel>
-                <Label Content="Caboose"
-                       Style="{DynamicResource H1}"/>
-                <Label Content="Speed/Direction"
-                       Style="{DynamicResource H2}"/>
+                <Label Content="Caboose" Style="{DynamicResource H1}"/>
+                <Label Content="Speed/Direction" Style="{DynamicResource H2}"/>
                 <StackPanel Orientation="Horizontal">
-                    <ToggleButton Width="50"
-                                  Height="50"
+                    <ToggleButton Width="50" Height="50"
+                                  cal:Message.Attach="[Event Click] = [Action SetSpeed('R1')]"
                                   Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                        <Rectangle Width="20"
-                                   Height="20"
-                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
+                        <Rectangle Width="20" Height="20" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
                             <Rectangle.OpacityMask>
-                                <VisualBrush Stretch="Fill"
-                                             Visual="{DynamicResource appbar_control_rewind_variant}" />
+                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_control_rewind_variant}" />
                             </Rectangle.OpacityMask>
                         </Rectangle>
                     </ToggleButton>
-                    <ToggleButton Width="50"
-                                  Height="50"
+                    <ToggleButton Width="50" Height="50"
+                                  cal:Message.Attach="[Event Click] = [Action SetSpeed('ST')]"
                                   Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                        <Rectangle Width="20"
-                                   Height="20"
-                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
+                        <Rectangle Width="20" Height="20" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
                             <Rectangle.OpacityMask>
-                                <VisualBrush Stretch="Fill"
-                                             Visual="{DynamicResource appbar_control_stop}" />
+                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_control_stop}" />
                             </Rectangle.OpacityMask>
                         </Rectangle>
                     </ToggleButton>
-                    <ToggleButton Width="50"
-                                  Height="50"
+                    <ToggleButton Width="50" Height="50"
+                                  cal:Message.Attach="[Event Click] = [Action SetSpeed('F1')]"
                                   Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                        <Rectangle Width="20"
-                                   Height="20"
-                                   Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
+                        <Rectangle Width="20" Height="20" Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
                             <Rectangle.OpacityMask>
-                                <VisualBrush Stretch="Fill"
-                                             Visual="{DynamicResource appbar_control_play}" />
+                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_control_play}" />
                             </Rectangle.OpacityMask>
                         </Rectangle>
                     </ToggleButton>
-                    <ToggleButton Width="50"
-                                  Height="50"
+                    <ToggleButton Width="50" Height="50"
+                                  cal:Message.Attach="[Event Click] = [Action SetSpeed('F2')]"
                                   Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                        <Rectangle Width="20"
-                                   Height="20"
+                        <Rectangle Width="20" Height="20"
                                    Fill="{Binding Path=Foreground, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ToggleButton}}}">
                             <Rectangle.OpacityMask>
-                                <VisualBrush Stretch="Fill"
-                                             Visual="{DynamicResource appbar_control_fastforward_variant}" />
+                                <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_control_fastforward_variant}" />
                             </Rectangle.OpacityMask>
                         </Rectangle>
                     </ToggleButton>
@@ -68,175 +61,44 @@
                 <TextBox TextAlignment="Center"
                          Width="50"/>
             </StackPanel>
-            <StackPanel>
-                <Label Content="Target #1"
-                       Style="{DynamicResource H1}"/>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Red">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Blue">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <Label Content="Hit ID"
+            <ItemsControl x:Name="Targets">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" IsItemsHost="True"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel cal:Bind.Model="{Binding}">
+                            <Label x:Name="Name" Style="{DynamicResource H1}"/>
+                            <controls:LockedToggleButton IsChecked="{Binding RedLed, Mode=OneWay}"
+                                                         cal:Message.Attach="[Event Click] = [Action ToggleRedLed($dataContext)]"
+                                                         Width="50" Height="50" Margin="0,10,0,0"
+                                                         Style="{DynamicResource MetroCircleToggleButtonStyle}">
+                                <Rectangle Width="20" Height="30" Fill="Red">
+                                    <Rectangle.OpacityMask>
+                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_lightbulb}" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                            </controls:LockedToggleButton>
+                            <ToggleButton IsChecked="{Binding BlueLed, Mode=OneWay}"
+                                                         cal:Message.Attach="[Event Click] = [Action ToggleBlueLed($dataContext)]"
+                                                         Width="50" Height="50" Margin="0,10,0,0"
+                                                         Style="{DynamicResource MetroCircleToggleButtonStyle}">
+                                <Rectangle Width="20" Height="30" Fill="Blue">
+                                    <Rectangle.OpacityMask>
+                                        <VisualBrush Stretch="Fill" Visual="{DynamicResource appbar_lightbulb}" />
+                                    </Rectangle.OpacityMask>
+                                </Rectangle>
+                            </ToggleButton>
+                            <Label Content="Hit ID"
                        Style="{DynamicResource H2}"/>
-                <TextBox TextAlignment="Center"
+                            <TextBox TextAlignment="Center"
                          Width="50"/>
-            </StackPanel>
-            <StackPanel>
-                <Label Content="Target #2"
-                       Style="{DynamicResource H1}"/>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Red">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Blue">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <Label Content="Hit ID"
-                       Style="{DynamicResource H2}"/>
-                <TextBox TextAlignment="Center"
-                         Width="50"/>
-            </StackPanel>
-            <StackPanel>
-                <Label Content="Target #3"
-                       Style="{DynamicResource H1}"/>
-                <ToggleButton Width="50" Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Red">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Blue">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <Label Content="Hit ID"
-                       Style="{DynamicResource H2}"/>
-                <TextBox TextAlignment="Center"
-                         Width="50"/>
-            </StackPanel>
-            <StackPanel>
-                <Label Content="Target #4"
-                       Style="{DynamicResource H1}"/>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Red">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Blue">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <Label Content="Hit ID"
-                       Style="{DynamicResource H2}"/>
-                <TextBox TextAlignment="Center"
-                         Width="50"/>
-            </StackPanel>
-            <StackPanel>
-                <Label Content="Target #5"
-                       Style="{DynamicResource H1}"/>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Red">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <ToggleButton Width="50"
-                              Height="50"
-                              Margin="0, 10, 0, 0"
-                              Style="{DynamicResource MetroCircleToggleButtonStyle}">
-                    <Rectangle Width="20"
-                               Height="30"
-                               Fill="Blue">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill"
-                                         Visual="{DynamicResource appbar_lightbulb}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                </ToggleButton>
-                <Label Content="Hit ID"
-                       Style="{DynamicResource H2}"/>
-                <TextBox TextAlignment="Center"
-                         Width="50"/>
-            </StackPanel>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
-    </Grid>
+    </StackPanel>
 </UserControl>

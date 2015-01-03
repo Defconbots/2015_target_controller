@@ -6,6 +6,7 @@
     xmlns:controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:targetControl="clr-namespace:TargetControl"
+    xmlns:cal="http://www.caliburnproject.org"
     mc:Ignorable="d"
     Height="600"
     Width="800"
@@ -28,6 +29,32 @@
             </Grid>
         </DataTemplate>
     </controls:MetroWindow.IconTemplate>
+
+    <controls:MetroWindow.Flyouts>
+        <controls:FlyoutsControl ItemsSource="{Binding Flyouts}">
+            <controls:FlyoutsControl.Template>
+                <ControlTemplate>
+                    <Grid>
+                        <ItemsPresenter/>                       
+                    </Grid>
+                </ControlTemplate>
+            </controls:FlyoutsControl.Template>
+            <controls:FlyoutsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type targetControl:FlyoutViewModel}">
+                    <ContentControl cal:View.Model="{Binding ViewModel}"/>
+                </DataTemplate>
+            </controls:FlyoutsControl.ItemTemplate>
+            <controls:FlyoutsControl.ItemContainerStyle>
+                <Style BasedOn="{StaticResource {x:Type controls:Flyout}}"
+                       TargetType="{x:Type controls:Flyout}">
+                    <Setter Property="Header" Value="{Binding Header}" />
+                    <Setter Property="IsOpen" Value="{Binding IsOpen}" />
+                    <Setter Property="Position" Value="{Binding Position}" />
+                    <Setter Property="IsModal" Value="{Binding IsModal}" />
+                </Style>
+            </controls:FlyoutsControl.ItemContainerStyle>
+        </controls:FlyoutsControl>
+    </controls:MetroWindow.Flyouts>
 
     <controls:MetroAnimatedSingleRowTabControl x:Name="Tabs"/>
     

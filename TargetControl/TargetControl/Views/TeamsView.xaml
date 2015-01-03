@@ -30,7 +30,8 @@
                     Content="Add"
                     Margin="0,25,0,10"
                     Style="{DynamicResource SquareButtonStyle}"/>
-            <Button Content="Remove"
+            <Button cal:Message.Attach="[Event Click] = [Action RemoveTeam(TeamDataGrid.SelectedItem)]"
+                    Content="Remove"
                     Margin="0,0,0,10"
                     Style="{DynamicResource SquareButtonStyle}"/>
             <Button Content="Edit"
@@ -42,12 +43,11 @@
                   RenderOptions.ClearTypeHint="Enabled"
                   TextOptions.TextFormattingMode="Display"
                   ItemsSource="{Binding Teams}"
+                  SelectionMode="Single"
+                  SelectionUnit="FullRow"
+                  IsReadOnly="True"
                   AutoGenerateColumns="False">
             <DataGrid.Columns>
-                <DataGridCheckBoxColumn ElementStyle="{DynamicResource MetroDataGridCheckBox}"
-                                        EditingElementStyle="{DynamicResource MetroDataGridCheckBox}"
-                                        Binding="{Binding RelativeSource={RelativeSource AncestorType=DataGridRow}, Path=IsSelected, Mode=OneWay}" />
-                
                 <DataGridTextColumn Header="Name"
                                     Binding="{Binding Name}"/>
                 
