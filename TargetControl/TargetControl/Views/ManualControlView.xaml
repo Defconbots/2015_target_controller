@@ -56,10 +56,13 @@
                         </Rectangle>
                     </ToggleButton>
                 </StackPanel>
-                <Label Content="Battery Voltage"
+                <Label Content="Battery Voltage"                       
                        Style="{DynamicResource H2}"/>
-                <TextBox TextAlignment="Center"
-                         Width="50"/>
+                <TextBlock x:Name="Voltage" TextAlignment="Center" Width="50"/>
+                <Button cal:Message.Attach="[Event Click] = [Action ReadVoltage()]"
+                                    Width="50">
+                    Read
+                </Button>
             </StackPanel>
             <ItemsControl x:Name="Targets">
                 <ItemsControl.ItemsPanel>
@@ -91,10 +94,12 @@
                                     </Rectangle.OpacityMask>
                                 </Rectangle>
                             </ToggleButton>
-                            <Label Content="Hit ID"
-                       Style="{DynamicResource H2}"/>
-                            <TextBox TextAlignment="Center"
-                         Width="50"/>
+                            <Label Content="Hit ID" Style="{DynamicResource H2}"/>
+                            <TextBlock x:Name="HitId" TextAlignment="Center" Width="50"/>
+                            <Button cal:Message.Attach="[Event Click] = [Action ReadHitId($dataContext)]"
+                                    Width="50">
+                                Read
+                            </Button>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

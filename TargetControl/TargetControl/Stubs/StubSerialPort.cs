@@ -30,6 +30,10 @@ namespace TargetControl
             {
                 if (buf == "[1R01]" || buf == "[1R00]")
                     _outBuf += "<1>";
+                else if (buf == "{1I}")
+                    _outBuf += "(12)";
+                else if (buf == "{0V}")
+                    _outBuf += "(45)";
             }
         }
 
