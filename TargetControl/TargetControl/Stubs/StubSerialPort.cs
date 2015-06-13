@@ -13,9 +13,11 @@ namespace TargetControl
         private DispatcherTimer _timer;
         private string _outBuf;
 
+        public string ComPort { get; set; }
+        public int BaudRate { get; set; }
         public event Action<string> SerialDataReceived;
 
-        public void Open(string comPort, int baudRate)
+        public void Open()
         {
             _isOpen = true;
             _timer = new DispatcherTimer();

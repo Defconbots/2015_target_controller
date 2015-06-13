@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO.Ports;
+using System.Linq;
 
 using Caliburn.Micro;
 
@@ -6,45 +7,23 @@ namespace TargetControl
 {
     public sealed class ManualControlViewModel : Screen, IMainScreenTabItem
     {
-        private readonly ISerial _serialPort;
         private readonly ISerialCommandInterface _serialInterface;
 
-        private string _selectedSerialPort;
         private string _voltage;
 
-        public ManualControlViewModel(ISerialPortListProvider availableSerialPortsProvider,
-            ISerial serialPort,
-            ISerialCommandInterface serialInterface)
+        public ManualControlViewModel(ISerialCommandInterface serialInterface)
         {
-            _serialPort = serialPort;
             _serialInterface = serialInterface;
             DisplayName = "Manual";
-
-            var availablePorts = availableSerialPortsProvider.GetPortNames();
-            AvailableSerialPorts = new BindableCollection<string>(availablePorts);
 
             var targets = Enumerable.Range(1, 5)
                 .Select(x => new ManualControlTargetViewModel((char)('0' + x)));
             Targets = new BindableCollection<ManualControlTargetViewModel>(targets);
 
-            SelectedAvailableSerialPort = AvailableSerialPorts.FirstOrDefault();
-
             _serialInterface.DataReceived += OnSerialCommandDataReceived;
         }
 
-        public BindableCollection<string> AvailableSerialPorts { get; set; }
-
         public BindableCollection<ManualControlTargetViewModel> Targets { get; set; }
-
-        public string SelectedAvailableSerialPort
-        {
-            get { return _selectedSerialPort; }
-            set
-            {
-                _selectedSerialPort = value;
-                NotifyOfPropertyChange(() => SelectedAvailableSerialPort);
-            }
-        }
 
         public string Voltage
         {
@@ -58,7 +37,7 @@ namespace TargetControl
 
         public void OpenSerialPort()
         {
-            _serialPort.Open(SelectedAvailableSerialPort, 57600);
+            _serialInterface.Connect();
         }
 
         public void ReadVoltage()

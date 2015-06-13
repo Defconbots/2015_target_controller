@@ -26,6 +26,14 @@ namespace TargetControl.Test
         }
 
         [Test]
+        public void WhenConnecting_ExpectOpensSerialPort()
+        {
+            _sci.Connect();
+            
+            _serial.Verify(x => x.Open());
+        }
+
+        [Test]
         public void WhenSendingRead_ExpectDataSentToSerial()
         {
             _sci.Read('0', 'V');
@@ -106,7 +114,7 @@ namespace TargetControl.Test
         {
             _sci.Write('1', 'R', '0', '0');
 
-            _serial.Verify(x => x.SendPacket("[1R00]"));
+            _serial.Verify(x => x.SendPacket("[1R00]\r\n"));
         }
 
         [Test]
@@ -124,6 +132,70 @@ namespace TargetControl.Test
                 DataH = '0',
                 DataL = '0'
             }, data);
+        }
+
+        [Test]
+        public void WhenReceivingNothing_ExpectNothingHappens()
+        {
+            object data = null;
+            _sci.DataReceived += v => data = v;
+            _serial.Raise(x => x.SerialDataReceived += null, "");
+        
+            Assert.IsNull(data);
+        }
+
+        [Test]
+        public void WhenReceivingInvalidReadResponse_ExpectNothingHappens()
+        {
+            object data = null;
+            _sci.DataReceived += v => data = v;
+            _sci.Read('3', 'R');
+            _serial.Raise(x => x.SerialDataReceived += null, "(111");
+        
+            Assert.IsNull(data);
+        }
+
+        [Test]
+        public void WhenReceivingPartialWriteResponse_ExpectNothingHappens()
+        {
+            object data = null;
+            _sci.DataReceived += v => data = v;
+            _sci.Write('3', 'R', '0', '0');
+            _serial.Raise(x => x.SerialDataReceived += null, "<1");
+        
+            Assert.IsNull(data);
+        }
+
+        [Test]
+        public void WhenReceivingInvalidWriteResponse_ExpectNothingHappens()
+        {
+            object data = null;
+            _sci.DataReceived += v => data = v;
+            _sci.Write('3', 'R', '0', '0');
+            _serial.Raise(x => x.SerialDataReceived += null, "<1X");
+        
+            Assert.IsNull(data);
+        }
+
+        [Test]
+        public void WhenReceivingWriteResponseFromWrongDevice_ExpectNothingHappens()
+        {
+            object data = null;
+            _sci.DataReceived += v => data = v;
+            _sci.Write('3', 'R', '0', '0');
+            _serial.Raise(x => x.SerialDataReceived += null, "<1>");
+        
+            Assert.IsNull(data);
+        }
+
+        [Test]
+        public void WhenReceivingInvalidResponse_ExpectNothingHappens()
+        {
+            object data = null;
+            _sci.DataReceived += v => data = v;
+            _serial.Raise(x => x.SerialDataReceived += null, "X");
+        
+            Assert.IsNull(data);
         }
     }
 }

@@ -9,15 +9,25 @@ namespace TargetControl
 {
     public interface ISerial
     {
-        void SendPacket(string buf);
         event Action<string> SerialDataReceived;
-        void Open(string comPort, int baudRate);
-    }
+
+        string ComPort { get; set; }
+
+        int BaudRate { get; set; }
+        
+        void Open();
     
+        void SendPacket(string buf);
+    }
+
     public class SerialPortSerial : ISerial
     {
         private SerialPort _serialPort;
 
+        public string ComPort { get; set; }
+        
+        public int BaudRate { get; set; }
+        
         public event Action<string> SerialDataReceived;
 
         public void SendPacket(string buf)
@@ -28,7 +38,7 @@ namespace TargetControl
             }
         }
 
-        public void Open(string comPort, int baudRate)
+        public void Open()
         {
             if (_serialPort != null)
             {
@@ -37,7 +47,7 @@ namespace TargetControl
                 _serialPort.Dispose();
             }
 
-            _serialPort = new SerialPort(comPort, baudRate);
+            _serialPort = new SerialPort(ComPort, BaudRate);
             _serialPort.DataReceived += OnDataReceived;
             _serialPort.Open();
         }

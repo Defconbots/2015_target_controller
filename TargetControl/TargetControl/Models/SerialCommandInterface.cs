@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO.Ports;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ namespace TargetControl
         event Action<SCIReadData> DataReceived;
         void Read(char address, char device);
         void Write(char address, char device, char dataH, char dataL);
+        void Connect();
     }
 
     public class SerialCommandInterface : ISerialPacketHandler, ISerialCommandInterface
@@ -30,7 +32,12 @@ namespace TargetControl
             _serial.SerialDataReceived += OnSerialDataReceived;
         }
 
-        public event Action<SCIReadData> DataReceived = delegate { }; 
+        public event Action<SCIReadData> DataReceived = delegate { };
+
+        public void Connect()
+        {
+            _serial.Open();
+        }
 
         public void Read(char address, char device)
         {
