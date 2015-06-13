@@ -21,11 +21,15 @@ namespace TargetControl
         IHandle<ShowFlyoutEvent>,
         IHandle<RemoveFlyoutEvent>
     {
+        private readonly IEventAggregator _eventAggregator;
+        private SettingsViewModel _settingsVM;
         public BindableCollection<IMainScreenTabItem> Tabs { get; set; }
         public BindableCollection<FlyoutViewModel> Flyouts { get; set; }
 
-        public ShellViewModel(IEnumerable<IMainScreenTabItem> tabs, IEventAggregator eventAggregator)
+        public ShellViewModel(IEnumerable<IMainScreenTabItem> tabs, IEventAggregator eventAggregator, SettingsViewModel settingsVm)
         {
+            _eventAggregator = eventAggregator;
+            _settingsVM = settingsVm;
             DisplayName = "DEFCONBOTS CONTEST CONTROLLER";
 
             Tabs = new BindableCollection<IMainScreenTabItem>(tabs);
@@ -34,15 +38,30 @@ namespace TargetControl
             eventAggregator.Subscribe(this);
         }
 
+        public void Settings()
+        {
+            _eventAggregator.PublishOnUIThread(new ShowFlyoutEvent
+            {
+                ViewModel = _settingsVM,
+                Position = Position.Right,
+            });
+        }
+
         public void Handle(ShowFlyoutEvent message)
         {
+            foreach (var flyout in Flyouts)
+            {
+                flyout.IsOpen = false;
+            }
+            Flyouts.Clear();
+
             Flyouts.Add(new FlyoutViewModel
             {
                 ViewModel = message.ViewModel,
                 Position = message.Position,
                 IsOpen = true,
                 Header = "TEST",
-                IsModal = true
+                IsModal = message.IsModal
             });
         }
 
@@ -70,6 +89,8 @@ namespace TargetControl
         public IScreen ViewModel { get; set; }
 
         public Position Position { get; set; }
+
+        public bool IsModal { get; set; }
     }
 
     public class FlyoutViewModel : PropertyChangedBase

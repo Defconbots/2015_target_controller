@@ -48,7 +48,6 @@ namespace TargetControl
                     typeof(ContestViewModel),
                     typeof(ManualControlViewModel),
                     typeof(TerminalViewModel),
-                    typeof(SettingsViewModel)
                 });
             
             _container.Verify();

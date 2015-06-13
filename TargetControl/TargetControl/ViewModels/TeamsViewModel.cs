@@ -45,7 +45,8 @@ namespace TargetControl
             _eventAggregator.PublishOnUIThread(new ShowFlyoutEvent
             {
                 ViewModel = new AddTeamViewModel(AddTeamFinal),
-                Position = Position.Left
+                Position = Position.Left,
+                IsModal = true
             });
         }
 
