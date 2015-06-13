@@ -58,7 +58,7 @@ namespace TargetControl
 
         public void OpenSerialPort()
         {
-            _serialPort.Open(SelectedAvailableSerialPort, 115200);
+            _serialPort.Open(SelectedAvailableSerialPort, 57600);
         }
 
         public void ReadVoltage()
@@ -76,12 +76,14 @@ namespace TargetControl
 
         public void ToggleRedLed(ManualControlTargetViewModel target)
         {
-            _serialInterface.Write(target.Address, 'R', '0', target.RedLed ? '0' : '1');
+            var led = !target.RedLed ? "99" : "00";
+            _serialInterface.Write(target.Address, 'R', led[0], led[1]);
         }
 
         public void ToggleBlueLed(ManualControlTargetViewModel target)
         {
-            _serialInterface.Write(target.Address, 'B', '0', target.BlueLed ? '0' : '1');
+            var led = !target.BlueLed ? "99" : "00";
+            _serialInterface.Write(target.Address, 'B', led[0], led[1]);
         }
 
         public void ReadHitId(ManualControlTargetViewModel target)

@@ -15,7 +15,7 @@ namespace TargetControl
 
     public class SerialCommandInterface : ISerialPacketHandler, ISerialCommandInterface
     {
-        private ISerial _serial;
+        private readonly ISerial _serial;
         private readonly ISerialPacketParser _serialParser;
         private char _lastAddress;
         private char _lastDevice;
@@ -42,7 +42,7 @@ namespace TargetControl
 
         public void Write(char address, char device, char dataH, char dataL)
         {
-            var buf = string.Format("[{0}{1}{2}{3}]", address, device, dataH, dataL);
+            var buf = string.Format("[{0}{1}{2}{3}]\r\n", address, device, dataH, dataL);
             _serial.SendPacket(buf);
             _lastAddress = address;
             _lastDevice = device;
