@@ -24,23 +24,5 @@ namespace TargetControl
         {
             InitializeComponent();
         }
-        private void UpdateTerminalOutput(string text, Brush color)
-        {
-            TextPointer start = terminalOutputText.Document.ContentStart;
-            terminalOutputText.AppendText(text);
-            TextPointer end = terminalOutputText.Document.ContentEnd;
-            terminalOutputText.Selection.Select(start, end);
-            terminalOutputText.Selection.ApplyPropertyValue(RichTextBox.ForegroundProperty, color);
-            terminalOutputText.ScrollToEnd();
-        }
-        private void terminalInputText_KeyUp(object sender,KeyEventArgs e)
-        {
-            if (e.Key==Key.Enter)
-            {
-                string input_data = terminalInputText.Text + Environment.NewLine;
-                UpdateTerminalOutput(input_data,Brushes.Red);
-                terminalInputText.Clear();
-            }
-        }
     }
 }

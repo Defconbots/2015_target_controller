@@ -9,6 +9,8 @@ namespace TargetControl
 {
     public interface ISerial
     {
+        event Action<string> SerialDataSent;
+
         event Action<string> SerialDataReceived;
 
         string ComPort { get; set; }
@@ -16,7 +18,7 @@ namespace TargetControl
         int BaudRate { get; set; }
         
         void Open();
-    
+
         void SendPacket(string buf);
     }
 
@@ -27,7 +29,9 @@ namespace TargetControl
         public string ComPort { get; set; }
         
         public int BaudRate { get; set; }
-        
+
+        public event Action<string> SerialDataSent;
+
         public event Action<string> SerialDataReceived;
 
         public void SendPacket(string buf)
@@ -35,6 +39,11 @@ namespace TargetControl
             if (_serialPort != null)
             {
                 _serialPort.Write(buf);
+
+                if (SerialDataSent != null)
+                {
+                    SerialDataSent(buf);
+                }
             }
         }
 

@@ -49,7 +49,7 @@ namespace TargetControl
 
         public void Write(char address, char device, char dataH, char dataL)
         {
-            var buf = string.Format("[{0}{1}{2}{3}]\r\n", address, device, dataH, dataL);
+            var buf = string.Format("[{0}{1}{2}{3}]", address, device, dataH, dataL);
             _serial.SendPacket(buf);
             _lastAddress = address;
             _lastDevice = device;

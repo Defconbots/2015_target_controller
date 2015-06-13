@@ -114,7 +114,7 @@ namespace TargetControl.Test
         {
             _sci.Write('1', 'R', '0', '0');
 
-            _serial.Verify(x => x.SendPacket("[1R00]\r\n"));
+            _serial.Verify(x => x.SendPacket("[1R00]"));
         }
 
         [Test]
