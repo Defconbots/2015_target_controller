@@ -10,7 +10,7 @@ namespace TargetControl
     public sealed class TerminalViewModel : Screen, IMainScreenTabItem
     {
         private readonly ISerial _serial;
-        private string _terminalOutputText;
+        private BindableCollection<TerminalLine> _terminalOutputText;
         private string _terminalInputText;
 
         public TerminalViewModel(ISerial serial)
@@ -19,9 +19,10 @@ namespace TargetControl
             _serial.SerialDataReceived += OnSerialDataReceived;
             _serial.SerialDataSent += OnSerialDataSent;
             DisplayName = "Terminal";
+            TerminalOutputText = new BindableCollection<TerminalLine>();
         }
 
-        public string TerminalOutputText
+        public BindableCollection<TerminalLine> TerminalOutputText
         {
             get { return _terminalOutputText; }
             set
@@ -60,12 +61,32 @@ namespace TargetControl
 
         private void OnSerialDataReceived(string serialData)
         {
-            TerminalOutputText += serialData + "\n";
+            AddText(serialData, true);
         }
 
         private void OnSerialDataSent(string serialData)
         {
-            TerminalOutputText += serialData + "\n";
+            AddText(serialData, false);
         }
+
+        private void AddText(string serialData, bool isReceived)
+        {
+            while (TerminalOutputText.Count > 20)
+            {
+                TerminalOutputText.RemoveAt(0);
+            }
+
+            TerminalOutputText.Add(new TerminalLine
+            {
+                Text = serialData,
+                IsReceived = isReceived
+            });
+        }
+    }
+
+    public class TerminalLine
+    {
+        public string Text { get; set; }
+        public bool IsReceived { get; set; }    
     }
 }

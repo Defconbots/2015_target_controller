@@ -20,10 +20,13 @@ namespace TargetControl
         {
             _buf += data;
 
-            var length = handler.CheckPacket(_buf);
-            if (length != null && length > 0)
+            while (true)
             {
-                _buf = _buf.Substring((int)length);
+                var length = handler.CheckPacket(_buf);
+                if (length == null)
+                    return;
+
+                _buf = length > 0 ? _buf.Substring((int)length) : _buf.Substring(1);
             }
         }
     }

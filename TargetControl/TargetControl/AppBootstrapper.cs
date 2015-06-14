@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-
+using System.Windows.Threading;
 using Caliburn.Micro;
 
 using SimpleInjector;
@@ -39,8 +39,10 @@ namespace TargetControl
                 _container.RegisterSingle<ISerial, StubSerialPort>();
             }
 
+            _container.Register<DispatcherTimer>(() => new DispatcherTimer());
             _container.RegisterSingle<ISerialPacketParser, SerialPacketParser>();
             _container.RegisterSingle<ISerialCommandInterface, SerialCommandInterface>();
+            _container.RegisterSingle<ITargetHitManager, TargetHitManager>();
 
             _container.RegisterAll(typeof(IMainScreenTabItem), new[]
                 {

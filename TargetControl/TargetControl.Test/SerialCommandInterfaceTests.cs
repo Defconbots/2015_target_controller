@@ -47,7 +47,7 @@ namespace TargetControl.Test
             object data = null;
             _sci.DataReceived += v => data = v;
             _sci.Read('0', 'V');
-            _serial.Raise(x => x.SerialDataReceived += null, "(01)");
+            _serial.Raise(x => x.SerialDataReceived += null, "(0V01)");
 
             Assert.AreEqual(new SCIReadData
             {
@@ -66,6 +66,8 @@ namespace TargetControl.Test
             _sci.Read('0', 'V');
             _serial.Raise(x => x.SerialDataReceived += null, "(");
             _serial.Raise(x => x.SerialDataReceived += null, "0");
+            _serial.Raise(x => x.SerialDataReceived += null, "V");
+            _serial.Raise(x => x.SerialDataReceived += null, "0");
             _serial.Raise(x => x.SerialDataReceived += null, "1");
             _serial.Raise(x => x.SerialDataReceived += null, ")");
 
@@ -82,12 +84,12 @@ namespace TargetControl.Test
         public void WhenTwoReadResponses_ExpectEventWithData()
         {
             _sci.Read('0', 'V');
-            _serial.Raise(x => x.SerialDataReceived += null, "(01)");
+            _serial.Raise(x => x.SerialDataReceived += null, "(0V01)");
 
             object data = null;
             _sci.DataReceived += v => data = v;
             _sci.Read('1', 'X');
-            _serial.Raise(x => x.SerialDataReceived += null, "(23)");
+            _serial.Raise(x => x.SerialDataReceived += null, "(1X23)");
 
             Assert.AreEqual(new SCIReadData
             {
@@ -123,7 +125,7 @@ namespace TargetControl.Test
             object data = null;
             _sci.DataReceived += v => data = v;
             _sci.Write('2', 'R', '0', '0');
-            _serial.Raise(x => x.SerialDataReceived += null, "<2>");
+            _serial.Raise(x => x.SerialDataReceived += null, "<2R>");
 
             Assert.AreEqual(new SCIReadData
             {
@@ -183,7 +185,7 @@ namespace TargetControl.Test
             object data = null;
             _sci.DataReceived += v => data = v;
             _sci.Write('3', 'R', '0', '0');
-            _serial.Raise(x => x.SerialDataReceived += null, "<1>");
+            _serial.Raise(x => x.SerialDataReceived += null, "<1R>");
         
             Assert.IsNull(data);
         }
@@ -196,6 +198,25 @@ namespace TargetControl.Test
             _serial.Raise(x => x.SerialDataReceived += null, "X");
         
             Assert.IsNull(data);
+        }
+
+        [Test]
+        public void WhenValidWriteResponseAfterWrontAddress_ExpectEventWithData()
+        {
+            object data = null;
+            _sci.DataReceived += v => data = v;
+            _sci.Write('2', 'R', '0', '0');
+            _serial.Raise(x => x.SerialDataReceived += null, "<3R>");
+            _sci.Write('2', 'R', '0', '0');
+            _serial.Raise(x => x.SerialDataReceived += null, "<2R>");
+
+            Assert.AreEqual(new SCIReadData
+            {
+                Address = '2',
+                Device = 'R',
+                DataH = '0',
+                DataL = '0'
+            }, data);
         }
     }
 }

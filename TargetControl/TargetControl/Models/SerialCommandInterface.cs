@@ -66,34 +66,36 @@ namespace TargetControl
 
             if (buf[0] == '(')
             {
-                if (buf.Length < 4)
+                if (buf.Length < 6)
                 {
                     return null;
                 }
 
-                if (buf[3] != ')')
+                if (buf[1] != _lastAddress || buf[5] != ')')
                 {
                     return -1;
                 }
 
                 DataReceived(new SCIReadData
                 {
-                    Address = _lastAddress,
-                    Device = _lastDevice,
-                    DataH = buf[1],
-                    DataL = buf[2]
+                    Address = buf[1],
+                    Device = buf[2],
+                    DataH = buf[3],
+                    DataL = buf[4]
                 });
-                return 4;
+                return 6;
             }
 
             if (buf[0] == '<')
             {
-                if (buf.Length < 3)
+                if (buf.Length < 4)
                 {
                     return null;
                 }
 
-                if (buf[1] != _lastAddress || buf[2] != '>')
+                if (buf[1] != _lastAddress ||
+                    buf[2] != _lastDevice ||
+                    buf[3] != '>')
                 {
                     return -1;
                 }
@@ -105,7 +107,7 @@ namespace TargetControl
                     DataH = _lastDataH,
                     DataL = _lastDataL
                 });
-                return 3;
+                return 4;
             }
 
             return -1;

@@ -83,6 +83,7 @@
     <Compile Include="Models\SerialCommandInterface.cs" />
     <Compile Include="Models\SerialPacketParser.cs" />
     <Compile Include="Models\SerialPortSerial.cs" />
+    <Compile Include="Models\TargetHitManager.cs" />
     <Compile Include="Stubs\StubSerialPort.cs" />
     <Compile Include="Stubs\StubSerialPortListProvider.cs" />
     <Compile Include="ViewModels\ContestViewModel.cs" />
