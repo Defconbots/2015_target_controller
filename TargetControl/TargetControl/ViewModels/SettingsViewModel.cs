@@ -28,6 +28,7 @@ namespace TargetControl
             AvailableSerialPorts = new BindableCollection<string>(availablePorts);
 
             _selectedSerialPort = AvailableSerialPorts.FirstOrDefault();
+            _serial.ComPort = _selectedSerialPort;
             _serial.BaudRate = 57600;
 
             LoadSettings();

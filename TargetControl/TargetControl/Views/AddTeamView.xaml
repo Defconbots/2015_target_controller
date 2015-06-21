@@ -11,6 +11,9 @@
         <TextBlock>Team Name</TextBlock>
         <TextBox x:Name="TeamName" Width="180"/>
 
+        <TextBlock Margin="0,20,0,0">Hit ID</TextBlock>
+        <TextBox x:Name="HitId" Width="180"/>
+
         <TextBlock Margin="0,20,0,0">Members</TextBlock>
         <ItemsControl x:Name="Members" KeyboardNavigation.IsTabStop="False">
             <ItemsControl.ItemTemplate>
@@ -38,6 +41,17 @@
             <Button x:Name="AddMember" Grid.Column="1" Width="40" Margin="5,0,0,0">+</Button>
         </Grid>
 
-        <Button x:Name="Add" Margin="0,20,0,0">Add</Button>
+        <Button x:Name="Add" Margin="0,20,0,0">
+            <Button.Style>
+                <Style TargetType="Button" BasedOn="{StaticResource MetroButton}">
+                    <Setter Property="Content" Value="Add"/>
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsEdit}" Value="True">
+                            <Setter Property="Content" Value="Edit"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Button.Style>
+        </Button>
     </StackPanel>
 </UserControl>

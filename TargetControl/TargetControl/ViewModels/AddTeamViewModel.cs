@@ -16,6 +16,11 @@ namespace TargetControl
         private readonly Action<AddTeamViewModel> _complete;
         private string _teamName = string.Empty;
         private string _newMemberName = string.Empty;
+        private int _hitId;
+
+        public string Guid { get; private set; }
+
+        public bool IsEdit { get; private set; }
 
         public string TeamName
         {
@@ -43,12 +48,37 @@ namespace TargetControl
             }
         }
 
+        public int HitId
+        {
+            get { return _hitId; }
+            set
+            {
+                if (value == _hitId)
+                {
+                    return;
+                }
+                _hitId = value;
+                NotifyOfPropertyChange();
+            }
+        }
+
         public BindableCollection<AddTeamMemberViewModel> Members { get; set; }
 
-        public AddTeamViewModel(Action<AddTeamViewModel> complete)
+        public AddTeamViewModel(Action<AddTeamViewModel> complete, Team team = null)
         {
             _complete = complete;
             Members = new BindableCollection<AddTeamMemberViewModel>();
+
+            Guid = System.Guid.NewGuid().ToString();
+
+            IsEdit = team != null;
+            if (team != null)
+            {
+                TeamName = team.Name;
+                HitId = team.HitId;
+                Members.AddRange(team.Members.Select(m => new AddTeamMemberViewModel(m.Name)));
+                Guid = team.Guid;
+            }
         }
 
         public void AddMember()

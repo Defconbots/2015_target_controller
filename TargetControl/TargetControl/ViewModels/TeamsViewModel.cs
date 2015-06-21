@@ -15,29 +15,20 @@ namespace TargetControl
     public sealed class TeamsViewModel : Screen, IMainScreenTabItem
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly TeamDatabaseSerializer _db;
+
         public BindableCollection<Team> Teams { get; set; }
 
-        public TeamsViewModel(IEventAggregator eventAggregator)
+        public TeamsViewModel(IEventAggregator eventAggregator, TeamDatabaseSerializer db)
         {
             _eventAggregator = eventAggregator;
+            _db = db;
             DisplayName = "Teams";
 
-            Teams = new BindableCollection<Team>
-            {
-                new Team{Name="test1",HitId="1",
-                    Members = new List<TeamMember>{new TeamMember{Name = "Joe",Email="joe@joe.com",Website="joe.com",PhoneNumber="555-555-5555"}},
-                    QualScores = new List<int>{0,1,2,3},
-                    FinalScores = new List<int>{5,6,7,8}},
-                new Team{Name="test1",HitId="1",
-                    Members = new List<TeamMember>{new TeamMember{Name = "Joe",Email="joe@joe.com",Website="joe.com",PhoneNumber="555-555-5555"},
-                                                   new TeamMember{Name = "Bob",Email="bob@bob.com",Website="bob.com",PhoneNumber="555-555-5551"}},
-                    QualScores = new List<int>{0,1,2,3},
-                    FinalScores = new List<int>{5,6,7,8}},
-                new Team{Name="test1",HitId="1",
-                    Members = new List<TeamMember>{new TeamMember{Name = "Joe",Email="joe@joe.com",Website="joe.com",PhoneNumber="555-555-5555"}},
-                    QualScores = new List<int>{0,1,2,3},
-                    FinalScores = new List<int>{5,6}}
-            };
+            Teams = new BindableCollection<Team>();
+
+            _db.DatabaseUpdated += UpdateFromDatabase;
+            _db.Load();
         }
 
         public void AddTeam()
@@ -50,27 +41,71 @@ namespace TargetControl
             });
         }
 
+        public void EditTeam(Team team)
+        {
+            _eventAggregator.PublishOnUIThread(new ShowFlyoutEvent
+            {
+                ViewModel = new AddTeamViewModel(EditTeamFinal, team),
+                Position = Position.Left,
+                IsModal = true
+            });
+        }
+
         public void RemoveTeam(Team team)
         {
-            Teams.Remove(team);
+            _db.Update(db => db.Teams.RemoveAll(t => t.Guid == team.Guid));
         }
 
         public void AddTeamFinal(AddTeamViewModel teamVM)
         {
             var team = new Team
             {
+                Guid = teamVM.Guid,
                 Name = teamVM.TeamName,
+                HitId = teamVM.HitId,
                 Members = teamVM.Members.Select(x => new TeamMember
                 {
                     Name = x.Name,
                 }).ToList()
             };
-            Teams.Add(team);
+
+            _db.Update(db => db.Teams.Add(team));
 
             _eventAggregator.PublishOnUIThread(new RemoveFlyoutEvent
             {
                 ViewModel = teamVM,
             });
+        }
+
+        public void EditTeamFinal(AddTeamViewModel teamVM)
+        {
+            _db.Update(db =>
+            {
+                var team = db.Teams.FirstOrDefault(t => t.Guid == teamVM.Guid);
+                if (team != null)
+                {
+                    team.Name = teamVM.TeamName;
+                    team.HitId = teamVM.HitId;
+                    team.Members = teamVM.Members.Select(x => new TeamMember
+                    {
+                        Name = x.Name,
+                    }).ToList();
+                }
+            });
+
+            _eventAggregator.PublishOnUIThread(new RemoveFlyoutEvent
+            {
+                ViewModel = teamVM,
+            });
+        }
+
+        private void UpdateFromDatabase()
+        {
+            Teams.Clear();
+            foreach (var team in _db.Database.Teams)
+            {
+                Teams.Add(team);
+            }
         }
     }
 
