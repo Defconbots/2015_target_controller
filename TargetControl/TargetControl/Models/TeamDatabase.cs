@@ -9,19 +9,28 @@ using Newtonsoft.Json;
 
 namespace TargetControl.Models
 {
+    public interface ITeamDatabaseSerializer
+    {
+        TeamDatabase Database { get; }
+        event Action DatabaseUpdated;
+        void Update(Action<TeamDatabase> updateFunc);
+    }
+
     /// <summary>
     /// This is the "database" that holds the information about the teams
     /// </summary>
-    public class TeamDatabaseSerializer
+    public class TeamDatabaseSerializer : ITeamDatabaseSerializer
     {
         private const string DatabaseFileName = "teams.json";
 
-        public TeamDatabase Database { get; set; } = new TeamDatabase();
+        public TeamDatabase Database { get; private set; }
 
         public event Action DatabaseUpdated;
 
-        public void Load()
+        public TeamDatabaseSerializer()
         {
+            Database = new TeamDatabase();
+
             if (File.Exists(DatabaseFileName))
             {
                 var settingsJson = File.ReadAllText(DatabaseFileName);
@@ -33,15 +42,23 @@ namespace TargetControl.Models
         {
             updateFunc(Database);
 
-            var serialized = JsonConvert.SerializeObject(this, Formatting.Indented);
+            var serialized = JsonConvert.SerializeObject(Database, Formatting.Indented);
             File.WriteAllText(DatabaseFileName, serialized);
 
-            DatabaseUpdated?.Invoke();
+            if (DatabaseUpdated != null)
+            {
+                DatabaseUpdated();
+            }
         }
     }
 
     public class TeamDatabase
     {
-        public List<Team> Teams { get; set; } = new List<Team>();
+        public TeamDatabase()
+        {
+            Teams = new List<Team>();
+        }
+
+        public List<Team> Teams { get; set; }
     }
 }

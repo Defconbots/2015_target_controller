@@ -10,6 +10,8 @@ using Caliburn.Micro;
 
 using SimpleInjector;
 
+using TargetControl.Models;
+
 namespace TargetControl
 {
     public class AppBootstrapper : BootstrapperBase
@@ -43,6 +45,7 @@ namespace TargetControl
             _container.RegisterSingle<ISerialPacketParser, SerialPacketParser>();
             _container.RegisterSingle<ISerialCommandInterface, SerialCommandInterface>();
             _container.RegisterSingle<ITargetHitManager, TargetHitManager>();
+            _container.RegisterSingle<ITeamDatabaseSerializer, TeamDatabaseSerializer>();
 
             _container.RegisterAll(typeof(IMainScreenTabItem), new[]
                 {
@@ -51,7 +54,9 @@ namespace TargetControl
                     typeof(ManualControlViewModel),
                     typeof(TerminalViewModel),
                 });
-            
+
+            _container.Options.AllowResolvingFuncFactories();
+
             _container.Verify();
         }
         
@@ -74,6 +79,33 @@ namespace TargetControl
         protected override void OnStartup(object sender, StartupEventArgs e)
         {
             DisplayRootViewFor<ShellViewModel>();
+        }
+    }
+
+    public static class SimpleInjectorExtensions
+    {
+        public static void AllowResolvingFuncFactories(this ContainerOptions options)
+        {
+            options.Container.ResolveUnregisteredType += (s, e) => {
+                var type = e.UnregisteredServiceType;
+
+                if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Func<>))
+                {
+                    return;
+                }
+
+                Type serviceType = type.GetGenericArguments().First();
+
+                InstanceProducer registration =
+                    options.Container.GetRegistration(serviceType, true);
+
+                Type funcType = typeof(Func<>).MakeGenericType(serviceType);
+
+                var factoryDelegate = System.Linq.Expressions.Expression.Lambda(funcType,
+                    registration.BuildExpression()).Compile();
+
+                e.Register(System.Linq.Expressions.Expression.Constant(factoryDelegate));
+            };
         }
     }
 }

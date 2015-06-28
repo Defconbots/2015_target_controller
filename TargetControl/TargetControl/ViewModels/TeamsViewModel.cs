@@ -15,11 +15,11 @@ namespace TargetControl
     public sealed class TeamsViewModel : Screen, IMainScreenTabItem
     {
         private readonly IEventAggregator _eventAggregator;
-        private readonly TeamDatabaseSerializer _db;
+        private readonly ITeamDatabaseSerializer _db;
 
         public BindableCollection<Team> Teams { get; set; }
 
-        public TeamsViewModel(IEventAggregator eventAggregator, TeamDatabaseSerializer db)
+        public TeamsViewModel(IEventAggregator eventAggregator, ITeamDatabaseSerializer db)
         {
             _eventAggregator = eventAggregator;
             _db = db;
@@ -28,7 +28,7 @@ namespace TargetControl
             Teams = new BindableCollection<Team>();
 
             _db.DatabaseUpdated += UpdateFromDatabase;
-            _db.Load();
+            UpdateFromDatabase();
         }
 
         public void AddTeam()
