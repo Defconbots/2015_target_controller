@@ -47,6 +47,11 @@ namespace TargetControl
             _container.RegisterSingle<ITargetHitManager, TargetHitManager>();
             _container.RegisterSingle<ITeamDatabaseSerializer, TeamDatabaseSerializer>();
 
+            _container.RegisterFuncFactory<ITeamDatabaseSerializer, TeamDatabaseSerializer>();
+            _container.RegisterFuncFactory<IContestSelectTeamViewModel, ContestSelectTeamViewModel>();
+            _container.RegisterFuncFactory<IContestPendingRoundViewModel, ContestPendingRoundViewModel>();
+            _container.RegisterFuncFactory<IContestActiveRoundViewModel, ContestActiveRoundViewModel>();
+
             _container.RegisterAll(typeof(IMainScreenTabItem), new[]
                 {
                     typeof(TeamsViewModel),
@@ -55,7 +60,7 @@ namespace TargetControl
                     typeof(TerminalViewModel),
                 });
 
-            _container.Options.AllowResolvingFuncFactories();
+            //_container.Options.AllowResolvingFuncFactories();
 
             _container.Verify();
         }
@@ -106,6 +111,32 @@ namespace TargetControl
 
                 e.Register(System.Linq.Expressions.Expression.Constant(factoryDelegate));
             };
+        }
+
+        public static void RegisterFuncFactory<TService, TImpl>(
+            this Container container, Lifestyle lifestyle = null)
+            where TService : class
+            where TImpl : class, TService
+        {
+            lifestyle = lifestyle ?? Lifestyle.Transient;
+
+            // Register the Func<T> that resolves that instance.
+            container.RegisterSingle<Func<TService>>(() =>
+            {
+                //var producer = new InstanceProducer(typeof (TService),
+                //    lifestyle.CreateRegistration<TService, TImpl>(container));
+
+                //Func<TService> instanceCreator =
+                //    () => (TService)producer.GetInstance();
+
+                //if (container.IsVerifying)
+                //{
+                //    instanceCreator.Invoke();
+                //}
+
+                //return instanceCreator;
+                return container.GetInstance<TImpl>();
+            });
         }
     }
 }

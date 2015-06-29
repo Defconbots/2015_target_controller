@@ -87,6 +87,9 @@
     <Compile Include="Models\TeamDatabase.cs" />
     <Compile Include="Stubs\StubSerialPort.cs" />
     <Compile Include="Stubs\StubSerialPortListProvider.cs" />
+    <Compile Include="ViewModels\ContestActiveRoundViewModel.cs" />
+    <Compile Include="ViewModels\ContestPendingRoundViewModel.cs" />
+    <Compile Include="ViewModels\ContestSelectTeamViewModel.cs" />
     <Compile Include="ViewModels\ContestViewModel.cs" />
     <Compile Include="ViewModels\ManualControlViewModel.cs" />
     <Compile Include="Models\SerialPortListProvider.cs" />
@@ -100,6 +103,12 @@
       <DependentUpon>AddTeamView.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\AddTeamViewModel.cs" />
+    <Compile Include="Views\ContestActiveRoundView.xaml.cs">
+      <DependentUpon>ContestActiveRoundView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ContestPendingRoundView.xaml.cs">
+      <DependentUpon>ContestPendingRoundView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ContestSelectTeamView.xaml.cs">
       <DependentUpon>ContestSelectTeamView.xaml</DependentUpon>
     </Compile>
@@ -123,6 +132,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\AddTeamView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ContestActiveRoundView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ContestPendingRoundView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

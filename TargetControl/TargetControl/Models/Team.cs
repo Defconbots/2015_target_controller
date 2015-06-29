@@ -11,13 +11,14 @@ namespace TargetControl.Models
     {
         public string Name { get; set; }
     }
+
     public class Team
     {
         public string Guid { get; set; }
         public string Name { get; set; }
         public int HitId { get; set; }
         public List<TeamMember> Members { get; set; }
-        public List<int> QualScores { get; set; }
-        public List<int> FinalScores { get; set; }
+        public int QualScore { get; set; }
+        public int FinalScore { get; set; }
     }
 }

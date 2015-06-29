@@ -10,6 +10,8 @@ namespace TargetControl
     public class CurrentWaveData
     {
         public List<WaveTarget> Targets { get; set; }
+
+        public int Score { get; set; }
     }
 
     public class WaveTarget
@@ -25,11 +27,25 @@ namespace TargetControl
         public int Health { get; set; }
     }
 
-    public class Contest
+    public interface IContest : IDisposable
     {
+        CurrentWaveData WaveData { get; set; }
+        event Action WaveDataUpdated;
+        void Start(string teamId, int waveNumber);
+        void Resume();
+        void Stop();
+    }
+
+    public class Contest : IContest
+    {
+        private const int ScoreForMiscall = 10000;
+        private const int ScoreForCalledShot = 150000;
+        private const int ScoreForHit = 100000;
+
         private readonly ITargetHitManager _targetHitManager;
         private readonly DispatcherTimer _resetTimer;
         private static readonly TimeSpan HitOffDelay = TimeSpan.FromSeconds(3);
+        private string _teamId;
 
         public Contest(ITargetHitManager targetManager, DispatcherTimer resetTimer)
         {
@@ -54,17 +70,63 @@ namespace TargetControl
 
         public CurrentWaveData WaveData { get; set; }
 
+        public event Action WaveDataUpdated;
+
+        public void Dispose()
+        {
+            _resetTimer.Stop();
+            _targetHitManager.OnHit -= OnHit;
+        }
+
+        public void Start(string teamId, int waveNumber)
+        {
+            _teamId = teamId;
+            WaveData = new CurrentWaveData
+            {
+                Targets = Enumerable.Range(1, 3)
+                    .Select(i => new WaveTarget((char)('0' + i), waveNumber))
+                    .ToList()
+            };
+            Resume();
+
+            if (WaveDataUpdated != null)
+            {
+                WaveDataUpdated();
+            }
+        }
+
+        public void Resume()
+        {
+            _targetHitManager.SetSpeed(TargetSpeed.Go);
+            UpdateTargetsToNormal();
+        }
+
+        public void Stop()
+        {
+            _targetHitManager.SetSpeed(TargetSpeed.Stop);
+            foreach (var target in WaveData.Targets)
+            {
+                _targetHitManager.SetRedLed(target.Address, false);
+                _targetHitManager.SetBlueLed(target.Address, false);
+            }
+        }
+
         private void OnResetTick(object sender, EventArgs e)
+        {
+            UpdateTargetsToNormal();
+            _resetTimer.Stop();
+        }
+
+        private void UpdateTargetsToNormal()
         {
             foreach (var target in WaveData.Targets)
             {
                 _targetHitManager.SetRedLed(target.Address, false);
                 _targetHitManager.SetBlueLed(target.Address, target.Health > 0);
             }
-            _resetTimer.Stop();
         }
 
-        private void OnHit(char address, string hitId)
+        private void OnHit(char address, string hitId, TargetHitType hitType)
         {
             if (_resetTimer.IsEnabled)
             {
@@ -72,13 +134,26 @@ namespace TargetControl
             }
 
             Console.WriteLine("**HIT** {0} {1}", address, hitId);
+            if (hitId != _teamId)
+            {
+                Console.WriteLine("-- wrong hit id");
+                return;
+            }
 
             var hitTarget = WaveData.Targets.FirstOrDefault(x => x.Address == address);
             if (hitTarget != null)
             {
                 if (hitTarget.Health > 0)
                 {
-                    hitTarget.Health--;
+                    if (hitType == TargetHitType.Miscalled)
+                    {
+                        WaveData.Score -= ScoreForMiscall;
+                    }
+                    else
+                    {
+                        hitTarget.Health--;
+                        WaveData.Score += hitType == TargetHitType.Called ? ScoreForCalledShot : ScoreForHit;
+                    }
                 }
                 else
                 {
@@ -92,6 +167,11 @@ namespace TargetControl
             {
                 _targetHitManager.SetRedLed(target.Address, address == target.Address);
                 _targetHitManager.SetBlueLed(target.Address, false);
+            }
+
+            if (WaveDataUpdated != null)
+            {
+                WaveDataUpdated();
             }
         }
     }

@@ -1,33 +1,39 @@
 ﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows.Threading;
 using Caliburn.Micro;
-
+using SimpleInjector.Advanced.Internal;
 using TargetControl.Models;
 
 namespace TargetControl
 {
+    public interface IContestStateMachineViewModel
+    {
+        event Action<IContestStateMachineViewModel> ChangeState;
+    }
+
     public sealed class ContestViewModel : Screen, IMainScreenTabItem
     {
-        private readonly Func<ContestSelectTeamViewModel> _createSelectTeamViewModel;
-        private object _currentState;
+        private IContestStateMachineViewModel _currentState;
 
-        public ContestViewModel(Func<ContestSelectTeamViewModel> createSelectTeamViewModel)
+        public ContestViewModel(Func<IContestSelectTeamViewModel> initialState)
         {
-            _createSelectTeamViewModel = createSelectTeamViewModel;
             DisplayName = "Contest";
 
-            SelectTeam();
+            ChangeState(initialState());
         }
 
-        private void SelectTeam()
+        private void ChangeState(IContestStateMachineViewModel state)
         {
-            CurrentState = _createSelectTeamViewModel();
-            //CurrentState.TeamSelected += CreateRound;
+            if (_currentState != null)
+            {
+                _currentState.ChangeState -= ChangeState;
+            }
+
+            state.ChangeState += ChangeState;
+            CurrentState = state;
         }
 
-        public object CurrentState
+        public IContestStateMachineViewModel CurrentState
         {
             get { return _currentState; }
             set
@@ -40,45 +46,5 @@ namespace TargetControl
                 NotifyOfPropertyChange();
             }
         }
-    }
-
-    public sealed class ContestSelectTeamViewModel : Screen
-    {
-        private readonly ITeamDatabaseSerializer _db;
-
-        public ContestSelectTeamViewModel(ITeamDatabaseSerializer db)
-        {
-            _db = db;
-            DisplayName = "Contest";
-            Teams = new ObservableCollection<Team>();
-
-            _db.DatabaseUpdated += OnDatabaseUpdated;
-            OnDatabaseUpdated();
-        }
-
-        public Team SelectedTeam { get; set; }
-
-        public ObservableCollection<Team> Teams { get; set; }
-
-        public void SelectTeam()
-        {
-        }
-
-        private void OnDatabaseUpdated()
-        {
-            Teams.Clear();
-            foreach (var team in _db.Database.Teams)
-                Teams.Add(team);
-
-            if (SelectedTeam == null)
-            {
-                SelectedTeam = Teams.FirstOrDefault();
-            }
-        }
-    }
-
-    public sealed class ContestPendingRoundViewModel : Screen
-    {
-        public Team Team { get; private set; }
     }
 }

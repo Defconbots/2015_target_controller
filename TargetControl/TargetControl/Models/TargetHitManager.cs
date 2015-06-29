@@ -7,9 +7,17 @@ namespace TargetControl
 {
     public interface ITargetHitManager
     {
-        event Action<char, string> OnHit;
+        event Action<char, string, TargetHitType> OnHit;
         void SetRedLed(char address, bool state);
         void SetBlueLed(char address, bool state);
+        void SetSpeed(TargetSpeed speed);
+    }
+
+    public enum TargetHitType
+    {
+        Wildcard,
+        Called,
+        Miscalled
     }
 
     public class TargetHitManager : ITargetHitManager
@@ -17,6 +25,8 @@ namespace TargetControl
         private readonly ISerialCommandInterface _serialInterface;
         private readonly DispatcherTimer _timer;
         private readonly List<Target> _targets;
+        private TargetSpeed _speedCmd;
+        private TargetSpeed _speedFb;
         private int _nextHitRead = 0;
         private bool _recvPacketLately;
 
@@ -36,7 +46,12 @@ namespace TargetControl
             _timer.Start();
         }
 
-        public event Action<char, string> OnHit;
+        public event Action<char, string, TargetHitType> OnHit;
+
+        public void SetSpeed(TargetSpeed speed)
+        {
+            _speedCmd = speed;
+        }
 
         public void SetRedLed(char address, bool state)
         {
@@ -58,6 +73,8 @@ namespace TargetControl
 
         private void OnInfoReceived(SCIReadData data)
         {
+            _recvPacketLately = true;
+
             var target = _targets.FirstOrDefault(x => x.Address == data.Address);
             if (target != null)
             {
@@ -71,19 +88,44 @@ namespace TargetControl
                 }
                 else if (data.Device == 'I')
                 {
+                    var hitType = TargetHitType.Wildcard;
+                    if (data.DataH >= 'a' && data.DataH <= 'j')
+                    {
+                        hitType = TargetHitType.Miscalled;
+                        data.DataH -= (char)('a' - '0');
+                    }
+                    else if (data.DataH >= 'A' && data.DataH <= 'J')
+                    {
+                        hitType = TargetHitType.Called;
+                        data.DataH -= (char)('A' - '0');
+                    }
+
                     var hitId = string.Format("{0}{1}", data.DataH, data.DataL);
                     if (hitId != "00")
                     {
-                        _serialInterface.Write(data.Address, data.Device, '0', '0');
                         if (OnHit != null)
                         {
-                            OnHit(data.Address, hitId);
+                            OnHit(data.Address, hitId, hitType);
                         }
+
+                        _serialInterface.Write(data.Address, data.Device, '0', '0');
+                        return;
                     }
                 }
             }
 
-            _recvPacketLately = true;
+            if (data.Address == '0')
+            {
+                if (data.Device == 'S')
+                {
+                    var speed = "" + data.DataH + data.DataL;
+                    _speedFb = speed == "ST" ? TargetSpeed.Stop :
+                               speed == "F1" ? TargetSpeed.Slow : 
+                               speed == "F2" ? TargetSpeed.Go :
+                                               TargetSpeed.Stop;
+                }
+            }
+
             Poll();
         }
 
@@ -98,6 +140,15 @@ namespace TargetControl
         private void Poll()
         {
             _recvPacketLately = false;
+            if (_speedCmd != _speedFb)
+            {
+                var speed = _speedCmd == TargetSpeed.Stop ? "ST" :
+                    _speedCmd == TargetSpeed.Slow ? "F1" :
+                    _speedCmd == TargetSpeed.Go ? "F2" : "";
+                _serialInterface.Write('0', 'S', speed[0], speed[1]);
+                return;
+            }
+
             var needsRedUpdate = _targets.FirstOrDefault(x => x.RedLedCmd != x.RedLedFb);
             if (needsRedUpdate != null)
             {
@@ -117,6 +168,13 @@ namespace TargetControl
             _serialInterface.Read(_targets[_nextHitRead].Address, 'I');
             _nextHitRead = (_nextHitRead + 1)%_targets.Count;
         }
+    }
+
+    public enum TargetSpeed
+    {
+        Stop,
+        Go,
+        Slow
     }
 
     public class Target

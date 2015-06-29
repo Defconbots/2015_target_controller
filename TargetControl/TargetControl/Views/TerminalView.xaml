@@ -26,7 +26,18 @@
                  Grid.Row="1">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Text}"/>
+                    <TextBlock Text="{Binding Text}">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Foreground" Value="#524C00"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsReceived}" Value="True">
+                                        <Setter Property="Foreground" Value="Blue"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

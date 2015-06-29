@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -74,6 +75,13 @@ namespace TargetControl
             while (TerminalOutputText.Count > 20)
             {
                 TerminalOutputText.RemoveAt(0);
+            }
+
+            var last = TerminalOutputText.LastOrDefault();
+            if (last != null && last.IsReceived == isReceived)
+            {
+                TerminalOutputText.Remove(last);
+                serialData = last.Text + serialData;
             }
 
             TerminalOutputText.Add(new TerminalLine
