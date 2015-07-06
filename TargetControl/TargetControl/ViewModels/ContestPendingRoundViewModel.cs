@@ -11,6 +11,7 @@ namespace TargetControl
         int Score { get; set; }
         int NumberLives { get; set; }
         int WaveNumber { get; set; }
+        int BestScore { get; set; }
     }
 
     public sealed class ContestPendingRoundViewModel : Screen, IContestPendingRoundViewModel
@@ -32,6 +33,7 @@ namespace TargetControl
             NumberLives = 3;
             WaveNumber = 1;
             Score = 0;
+            BestScore = 0;
         }
 
         public event Action<IContestStateMachineViewModel> ChangeState;
@@ -39,6 +41,8 @@ namespace TargetControl
         public Team Team { get; set; }
 
         public int Score { get; set; }
+
+        public int BestScore { get; set; }
 
         public int NumberLives
         {
@@ -91,7 +95,7 @@ namespace TargetControl
                 {
                     if (Score > team.QualScore)
                     {
-                        team.QualScore = Score;
+                        team.QualScore = BestScore;
                     }
                 }
             });
@@ -111,6 +115,7 @@ namespace TargetControl
                 vm.Team = Team;
                 vm.WaveNumber = WaveNumber;
                 vm.InitialScore = Score;
+                vm.InitialBestScore = BestScore;
                 vm.NumberLives = NumberLives;
                 vm.Start();
                 ChangeState(vm);

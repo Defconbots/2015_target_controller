@@ -35,7 +35,7 @@ namespace TargetControl
             _serialInterface = serialInterface;
             _timer = timer;
 
-            _targets = Enumerable.Range(1, 3)
+            _targets = Enumerable.Range(1, Contest.NumTargets)
                 .Select(x => new Target((char)('0' + x)))
                 .ToList();
 

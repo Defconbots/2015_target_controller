@@ -42,6 +42,8 @@ namespace TargetControl
             }
 
             _container.Register<DispatcherTimer>(() => new DispatcherTimer());
+            _container.Register<IContest, Contest>();
+            _container.Register<ITimer, UITimer>();
             _container.RegisterSingle<ISerialPacketParser, SerialPacketParser>();
             _container.RegisterSingle<ISerialCommandInterface, SerialCommandInterface>();
             _container.RegisterSingle<ITargetHitManager, TargetHitManager>();

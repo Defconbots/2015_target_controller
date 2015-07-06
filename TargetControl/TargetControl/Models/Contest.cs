@@ -41,6 +41,7 @@ namespace TargetControl
         private const int ScoreForMiscall = 10000;
         private const int ScoreForCalledShot = 150000;
         private const int ScoreForHit = 100000;
+        public const int NumTargets = 5;
 
         private readonly ITargetHitManager _targetHitManager;
         private readonly DispatcherTimer _resetTimer;
@@ -60,7 +61,7 @@ namespace TargetControl
 
             WaveData = new CurrentWaveData
             {
-                Targets = Enumerable.Range(1, 3)
+                Targets = Enumerable.Range(1, NumTargets)
                     .Select(i => new WaveTarget((char)('0' + i), 1))
                     .ToList()
             };
@@ -83,7 +84,7 @@ namespace TargetControl
             _teamId = teamId;
             WaveData = new CurrentWaveData
             {
-                Targets = Enumerable.Range(1, 3)
+                Targets = Enumerable.Range(1, NumTargets)
                     .Select(i => new WaveTarget((char)('0' + i), waveNumber))
                     .ToList()
             };
@@ -166,7 +167,7 @@ namespace TargetControl
             foreach (var target in WaveData.Targets)
             {
                 _targetHitManager.SetRedLed(target.Address, address == target.Address);
-                _targetHitManager.SetBlueLed(target.Address, false);
+                _targetHitManager.SetBlueLed(target.Address, hitType == TargetHitType.Miscalled && target.Health > 0);
             }
 
             if (WaveDataUpdated != null)

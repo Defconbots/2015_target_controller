@@ -22,17 +22,6 @@ namespace TargetControl
             ChangeState(initialState());
         }
 
-        private void ChangeState(IContestStateMachineViewModel state)
-        {
-            if (_currentState != null)
-            {
-                _currentState.ChangeState -= ChangeState;
-            }
-
-            state.ChangeState += ChangeState;
-            CurrentState = state;
-        }
-
         public IContestStateMachineViewModel CurrentState
         {
             get { return _currentState; }
@@ -45,6 +34,17 @@ namespace TargetControl
                 _currentState = value;
                 NotifyOfPropertyChange();
             }
+        }
+
+        private void ChangeState(IContestStateMachineViewModel state)
+        {
+            if (_currentState != null)
+            {
+                _currentState.ChangeState -= ChangeState;
+            }
+
+            state.ChangeState += ChangeState;
+            CurrentState = state;
         }
     }
 }

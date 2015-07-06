@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BootstrapperTests.cs" />
+    <Compile Include="ContestActiveRoundTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerialCommandInterfaceTests.cs" />
     <Compile Include="SerialPacketParserTests.cs" />

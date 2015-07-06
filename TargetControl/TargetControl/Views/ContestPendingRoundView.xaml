@@ -27,6 +27,10 @@
             <TextBlock Text="Score" Width="200" Foreground="{DynamicResource HighlightBrush}" TextAlignment="Right" Margin="5"/>
             <TextBlock Text="{Binding Score}" Margin="5"/>
         </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="BestScore" Width="200" Foreground="{DynamicResource HighlightBrush}" TextAlignment="Right" Margin="5"/>
+            <TextBlock Text="{Binding BestScore}" Margin="5"/>
+        </StackPanel>
         <Button x:Name="SaveResults" Width="100" Margin="5">Save Results</Button>
         <Button x:Name="StartRound" Width="100" Margin="5">Start Round</Button>
     </StackPanel>

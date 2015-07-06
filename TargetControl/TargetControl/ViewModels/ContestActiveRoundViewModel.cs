@@ -14,6 +14,7 @@ namespace TargetControl
         int NumberLives { get; set; }
         int WaveNumber { get; set; }
         int InitialScore { get; set; }
+        int InitialBestScore { get; set; }
         int TotalScore { get; }
         int WaveScore { get; }
         void Start();
@@ -21,13 +22,12 @@ namespace TargetControl
 
     public sealed class ContestActiveRoundViewModel : Screen, IContestActiveRoundViewModel
     {
-        private readonly Contest _contest;
-        private readonly DispatcherTimer _timer;
+        private readonly IContest _contest;
+        private readonly ITimer _timer;
         private readonly Func<IContestPendingRoundViewModel> _pendingFunc;
         private readonly DateTime _startTime;
-        private int _initialScore;
 
-        public ContestActiveRoundViewModel(Contest contest, DispatcherTimer timer, Func<IContestPendingRoundViewModel> pendingFunc)
+        public ContestActiveRoundViewModel(IContest contest, ITimer timer, Func<IContestPendingRoundViewModel> pendingFunc)
         {
             _contest = contest;
             _timer = timer;
@@ -59,6 +59,8 @@ namespace TargetControl
 
         public int InitialScore { get; set; }
 
+        public int InitialBestScore { get; set; }
+
         public int TotalScore
         {
             get { return InitialScore + _contest.WaveData.Score; }
@@ -67,6 +69,11 @@ namespace TargetControl
         public int WaveScore
         {
             get { return _contest.WaveData.Score; }
+        }
+
+        public int MaxScore
+        {
+            get { return Math.Max(InitialBestScore, TotalScore); }
         }
 
         public BindableCollection<ContestActiveRoundTargetViewModel> Targets { get; private set; }
@@ -88,12 +95,20 @@ namespace TargetControl
             if (Targets.All(x => x.Health == 0))
             {
                 WaveNumber++;
+                InitialScore += _contest.WaveData.Score;
             }
             else
             {
                 NumberLives--;
+                InitialBestScore = Math.Max(InitialBestScore, InitialScore + _contest.WaveData.Score);
             }
 
+            GoToPending();
+        }
+
+        public void Abort()
+        {
+            Stop();
             GoToPending();
         }
 
@@ -104,16 +119,11 @@ namespace TargetControl
                 var vm = _pendingFunc();
                 vm.Team = Team;
                 vm.WaveNumber = WaveNumber;
-                vm.Score = TotalScore;
+                vm.Score = InitialScore;
+                vm.BestScore = InitialBestScore;
                 vm.NumberLives = NumberLives;
                 ChangeState(vm);
             }
-        }
-
-        public void Abort()
-        {
-            Stop();
-            GoToPending();
         }
 
         private void Stop()
@@ -132,6 +142,7 @@ namespace TargetControl
 
             NotifyOfPropertyChange(() => WaveScore);
             NotifyOfPropertyChange(() => TotalScore);
+            NotifyOfPropertyChange(() => MaxScore);
         }
 
         private void OnTimerTick(object sender, EventArgs e)

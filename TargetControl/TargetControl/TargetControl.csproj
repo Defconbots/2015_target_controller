@@ -91,6 +91,7 @@
     <Compile Include="ViewModels\ContestPendingRoundViewModel.cs" />
     <Compile Include="ViewModels\ContestSelectTeamViewModel.cs" />
     <Compile Include="ViewModels\ContestViewModel.cs" />
+    <Compile Include="Models\ITimer.cs" />
     <Compile Include="ViewModels\ManualControlViewModel.cs" />
     <Compile Include="Models\SerialPortListProvider.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />

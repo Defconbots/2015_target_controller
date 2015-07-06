@@ -23,6 +23,8 @@
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Total Score" Width="200" Foreground="{DynamicResource HighlightBrush}" TextAlignment="Right" Margin="5"/>
             <TextBlock Text="{Binding TotalScore}" Margin="5"/>
+            <TextBlock Text="Max Score" Width="200" Foreground="{DynamicResource HighlightBrush}" TextAlignment="Right" Margin="5"/>
+            <TextBlock Text="{Binding MaxScore}" Margin="5"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Wave Score" Width="200" Foreground="{DynamicResource HighlightBrush}" TextAlignment="Right" Margin="5"/>
