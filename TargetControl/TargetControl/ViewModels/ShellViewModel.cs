@@ -23,6 +23,8 @@ namespace TargetControl
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly ISerialCommandInterface _serialCommandInterface;
+        private readonly IWindowManager _windowManager;
+        private readonly SpectatorViewModel _spectatorVm;
         private SettingsViewModel _settingsVM;
         private int _dataReceivedM4;
         public BindableCollection<IMainScreenTabItem> Tabs { get; set; }
@@ -43,11 +45,15 @@ namespace TargetControl
         public ShellViewModel(IEnumerable<IMainScreenTabItem> tabs,
             IEventAggregator eventAggregator,
             ISerialCommandInterface serialCommandInterface,
-            SettingsViewModel settingsVm)
+            SettingsViewModel settingsVm,
+            IWindowManager windowManager,
+            SpectatorViewModel spectatorVm)
         {
             _eventAggregator = eventAggregator;
             _serialCommandInterface = serialCommandInterface;
             _settingsVM = settingsVm;
+            _windowManager = windowManager;
+            _spectatorVm = spectatorVm;
             DisplayName = "DEFCONBOTS CONTEST CONTROLLER";
 
             Tabs = new BindableCollection<IMainScreenTabItem>(tabs);
@@ -65,6 +71,11 @@ namespace TargetControl
                 ViewModel = _settingsVM,
                 Position = Position.Right,
             });
+        }
+
+        public void Spectator()
+        {
+            _windowManager.ShowWindow(_spectatorVm);
         }
 
         public void Handle(ShowFlyoutEvent message)

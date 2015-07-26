@@ -89,6 +89,17 @@
                         <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="settings"/>
                     </StackPanel>
                 </Button>
+                <Button cal:Message.Attach="Spectator">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="20" Height="20"
+                                   Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_billboard}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="spectator"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>

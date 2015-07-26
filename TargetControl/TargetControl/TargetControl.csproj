@@ -58,6 +58,7 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.1.1.2.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -85,6 +86,7 @@
     <Compile Include="Models\SerialCommandInterface.cs" />
     <Compile Include="Models\SerialPacketParser.cs" />
     <Compile Include="Models\SerialPortSerial.cs" />
+    <Compile Include="ViewModels\SpectatorViewModel.cs" />
     <Compile Include="Models\TargetHitManager.cs" />
     <Compile Include="Models\TeamDatabase.cs" />
     <Compile Include="Stubs\StubSerialPort.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="Models\Team.cs" />
     <Compile Include="ViewModels\TeamsViewModel.cs" />
     <Compile Include="ViewModels\TerminalViewModel.cs" />
+    <Compile Include="ViewModels\WindowExt.cs" />
     <Compile Include="Views\AddTeamView.xaml.cs">
       <DependentUpon>AddTeamView.xaml</DependentUpon>
     </Compile>
@@ -123,6 +126,9 @@
     </Compile>
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SpectatorView.xaml.cs">
+      <DependentUpon>SpectatorView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\TeamsView.xaml.cs">
       <DependentUpon>TeamsView.xaml</DependentUpon>
@@ -171,6 +177,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\ManualControlView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\SpectatorView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
