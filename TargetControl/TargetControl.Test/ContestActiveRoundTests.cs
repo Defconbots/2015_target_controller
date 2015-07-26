@@ -18,6 +18,7 @@ namespace TargetControl.Test
         private StubPendingRoundVM _pendingRound;
         private ITimer _timer;
         private StubContest _contest;
+        private Mock<IContestModel> _contestModel;
 
         [SetUp]
         public void Setup()
@@ -25,13 +26,13 @@ namespace TargetControl.Test
             _pendingRound = new StubPendingRoundVM();
             _timer = new Mock<ITimer>().Object;
             _contest = new StubContest();
+            _contestModel = new Mock<IContestModel>();
         }
 
         [Test]
         public void WhenWaveCompleted_ExpectScoreAdded()
         {
             var vm = Create();
-            vm.InitialScore = 0;
             _contest.WaveData = new CurrentWaveData
             {
                 Score = 123456,
@@ -42,15 +43,13 @@ namespace TargetControl.Test
             };
             vm.Save();
 
-            Assert.AreEqual(123456, _pendingRound.Score);
+            _contestModel.Verify(x => x.CompleteWave(true, 123456));
         }
 
         [Test]
         public void WhenWaveNotCompleted_ExpectBestScoreAdded()
         {
             var vm = Create();
-            vm.InitialScore = 0;
-            vm.InitialBestScore = 100000;
             _contest.WaveData = new CurrentWaveData
             {
                 Score = 123456,
@@ -61,33 +60,12 @@ namespace TargetControl.Test
             };
             vm.Save();
 
-            Assert.AreEqual(0, _pendingRound.Score);
-            Assert.AreEqual(123456, _pendingRound.BestScore);
-        }
-
-        [Test]
-        public void WhenWaveNotCompletedWithBetterBestScore_ExpectBestScoreIgnored()
-        {
-            var vm = Create();
-            vm.InitialScore = 0;
-            vm.InitialBestScore = 500000;
-            _contest.WaveData = new CurrentWaveData
-            {
-                Score = 123456,
-                Targets = new List<WaveTarget>
-                {
-                    new WaveTarget('0', 3)
-                }
-            };
-            vm.Save();
-
-            Assert.AreEqual(0, _pendingRound.Score);
-            Assert.AreEqual(500000, _pendingRound.BestScore);
+            _contestModel.Verify(x => x.CompleteWave(false, 123456));
         }
 
         private ContestActiveRoundViewModel Create()
         {
-            var vm = new ContestActiveRoundViewModel(_contest, _timer, () => _pendingRound);
+            var vm = new ContestActiveRoundViewModel(_contest, _contestModel.Object, _timer, () => _pendingRound);
             vm.ChangeState += model => { };
             return vm;
         }
@@ -106,6 +84,12 @@ namespace TargetControl.Test
         public int NumberLives { get; set; }
 
         public int WaveNumber { get; set; }
+
+        public void RaiseChangeState(IContestStateMachineViewModel obj)
+        {
+            var handler = ChangeState;
+            if (handler != null) handler(obj);
+        }
     }
 
     public class StubContest : IContest

@@ -22,18 +22,38 @@ namespace TargetControl
         IHandle<RemoveFlyoutEvent>
     {
         private readonly IEventAggregator _eventAggregator;
+        private readonly ISerialCommandInterface _serialCommandInterface;
         private SettingsViewModel _settingsVM;
+        private int _dataReceivedM4;
         public BindableCollection<IMainScreenTabItem> Tabs { get; set; }
+
         public BindableCollection<FlyoutViewModel> Flyouts { get; set; }
 
-        public ShellViewModel(IEnumerable<IMainScreenTabItem> tabs, IEventAggregator eventAggregator, SettingsViewModel settingsVm)
+        public int DataReceivedM4
+        {
+            get { return _dataReceivedM4; }
+            set
+            {
+                if (value == _dataReceivedM4) return;
+                _dataReceivedM4 = value;
+                NotifyOfPropertyChange(() => DataReceivedM4);
+            }
+        }
+
+        public ShellViewModel(IEnumerable<IMainScreenTabItem> tabs,
+            IEventAggregator eventAggregator,
+            ISerialCommandInterface serialCommandInterface,
+            SettingsViewModel settingsVm)
         {
             _eventAggregator = eventAggregator;
+            _serialCommandInterface = serialCommandInterface;
             _settingsVM = settingsVm;
             DisplayName = "DEFCONBOTS CONTEST CONTROLLER";
 
             Tabs = new BindableCollection<IMainScreenTabItem>(tabs);
             Flyouts = new BindableCollection<FlyoutViewModel>();
+
+            _serialCommandInterface.DataReceived += OnDataReceived;
 
             eventAggregator.Subscribe(this);
         }
@@ -72,6 +92,11 @@ namespace TargetControl
             {
                 flyout.IsOpen = false;
             }
+        }
+
+        private void OnDataReceived(SCIReadData obj)
+        {
+            DataReceivedM4 = (DataReceivedM4 + 45)%360;
         }
     }
 

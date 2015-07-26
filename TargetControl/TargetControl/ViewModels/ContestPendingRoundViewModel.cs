@@ -7,98 +7,85 @@ namespace TargetControl
 {
     public interface IContestPendingRoundViewModel : IContestStateMachineViewModel
     {
-        Team Team { get; set; }
-        int Score { get; set; }
-        int NumberLives { get; set; }
-        int WaveNumber { get; set; }
-        int BestScore { get; set; }
     }
 
     public sealed class ContestPendingRoundViewModel : Screen, IContestPendingRoundViewModel
     {
-        private readonly ITeamDatabaseSerializer _db;
+        private readonly IContestModel _contestModel;
         private readonly Func<IContestSelectTeamViewModel> _selectTeam;
         private readonly Func<IContestActiveRoundViewModel> _activeFunc;
-        private int _numberLives;
-        private int _waveNumber;
 
-        public ContestPendingRoundViewModel(ITeamDatabaseSerializer db,
+        public ContestPendingRoundViewModel(
+            IContestModel contestModel,
             Func<IContestSelectTeamViewModel> selectTeam,
             Func<IContestActiveRoundViewModel> activeFunc)
         {
-            _db = db;
+            _contestModel = contestModel;
             _selectTeam = selectTeam;
             _activeFunc = activeFunc;
 
-            NumberLives = 3;
-            WaveNumber = 1;
-            Score = 0;
-            BestScore = 0;
+            _contestModel.TeamInfoUpdated += OnTeamInfoUpddated;
+        }
+
+        private void OnTeamInfoUpddated()
+        {
+            NotifyOfPropertyChange(() => Team);
+            NotifyOfPropertyChange(() => Score);
+            NotifyOfPropertyChange(() => BestScore);
+            NotifyOfPropertyChange(() => NumberLives);
+            NotifyOfPropertyChange(() => WaveNumber);
         }
 
         public event Action<IContestStateMachineViewModel> ChangeState;
 
-        public Team Team { get; set; }
+        public Team Team
+        {
+            get { return _contestModel.Team; }
+        }
 
-        public int Score { get; set; }
+        public int Score
+        {
+            get { return _contestModel.Score; }
+        }
 
-        public int BestScore { get; set; }
+        public int BestScore
+        {
+            get { return _contestModel.BestScore; }
+        }
 
         public int NumberLives
         {
-            get { return _numberLives; }
-            set
-            {
-                if (value == _numberLives) return;
-                _numberLives = value;
-                NotifyOfPropertyChange(() => NumberLives);
-            }
+            get { return _contestModel.NumberLives; }
         }
 
         public int WaveNumber
         {
-            get { return _waveNumber; }
-            set
-            {
-                if (value == _waveNumber) return;
-                _waveNumber = value;
-                NotifyOfPropertyChange(() => WaveNumber);
-            }
+            get { return _contestModel.WaveNumber; }
         }
 
         public void IncreaseNumLives()
         {
-            NumberLives++;
+            _contestModel.IncreaseNumLives();
         }
 
         public void DecreaseNumLives()
         {
-            NumberLives--;
+            _contestModel.DecreaseNumLives();
         }
 
         public void IncreaseWaveNumber()
         {
-            WaveNumber++;
+            _contestModel.IncreaseWaveNumber();
         }
 
         public void DecreaseWaveNumber()
         {
-            WaveNumber--;
+            _contestModel.DecreaseWaveNumber();
         }
 
         public void SaveResults()
         {
-            _db.Update(db =>
-            {
-                var team = db.Teams.FirstOrDefault(x => x.Guid == Team.Guid);
-                if (team != null)
-                {
-                    if (Score > team.QualScore)
-                    {
-                        team.QualScore = BestScore;
-                    }
-                }
-            });
+            _contestModel.SaveChanges();
 
             if (ChangeState != null)
             {
@@ -112,11 +99,6 @@ namespace TargetControl
             if (ChangeState != null)
             {
                 var vm = _activeFunc();
-                vm.Team = Team;
-                vm.WaveNumber = WaveNumber;
-                vm.InitialScore = Score;
-                vm.InitialBestScore = BestScore;
-                vm.NumberLives = NumberLives;
                 vm.Start();
                 ChangeState(vm);
             }

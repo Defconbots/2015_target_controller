@@ -13,13 +13,15 @@ namespace TargetControl
 
     public sealed class ContestSelectTeamViewModel : Screen, IContestSelectTeamViewModel
     {
+        private readonly IContestModel _contestModel;
         private readonly ITeamDatabaseSerializer _db;
         private readonly Func<IContestPendingRoundViewModel> _pendingRoundFunc;
 
-        public ContestSelectTeamViewModel(ITeamDatabaseSerializer db, Func<IContestPendingRoundViewModel> pendingRoundFunc)
+        public ContestSelectTeamViewModel(ITeamDatabaseSerializer db, Func<IContestPendingRoundViewModel> pendingRoundFunc, IContestModel contestModel)
         {
             _db = db;
             _pendingRoundFunc = pendingRoundFunc;
+            _contestModel = contestModel;
             DisplayName = "Contest";
             Teams = new ObservableCollection<Team>();
 
@@ -37,8 +39,9 @@ namespace TargetControl
         {
             if (ChangeState != null)
             {
+                _contestModel.SelectTeam(SelectedTeam);
+
                 var vm = _pendingRoundFunc();
-                vm.Team = SelectedTeam;
                 ChangeState(vm);
             }
         }

@@ -42,12 +42,14 @@ namespace TargetControl
             }
 
             _container.Register<DispatcherTimer>(() => new DispatcherTimer());
-            _container.Register<IContest, Contest>();
             _container.Register<ITimer, UITimer>();
+            _container.RegisterSingle<IContest, Contest>();
+            _container.RegisterSingle<ILogger, Logger>();
             _container.RegisterSingle<ISerialPacketParser, SerialPacketParser>();
             _container.RegisterSingle<ISerialCommandInterface, SerialCommandInterface>();
             _container.RegisterSingle<ITargetHitManager, TargetHitManager>();
             _container.RegisterSingle<ITeamDatabaseSerializer, TeamDatabaseSerializer>();
+            _container.RegisterSingle<IContestModel, ContestModel>();
 
             _container.RegisterFuncFactory<ITeamDatabaseSerializer, TeamDatabaseSerializer>();
             _container.RegisterFuncFactory<IContestSelectTeamViewModel, ContestSelectTeamViewModel>();

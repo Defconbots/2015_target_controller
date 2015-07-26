@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Ports;
 using System.Linq;
 using System.Text;
@@ -23,11 +24,13 @@ namespace TargetControl
         private char _lastDevice;
         private char _lastDataH;
         private char _lastDataL;
+        private Stopwatch _stopwatchTime;
 
         public SerialCommandInterface(ISerial serial, ISerialPacketParser serialParser)
         {
             _serial = serial;
             _serialParser = serialParser;
+            _stopwatchTime = new Stopwatch();
 
             _serial.SerialDataReceived += OnSerialDataReceived;
         }
@@ -45,6 +48,7 @@ namespace TargetControl
             _serial.SendPacket(buf);
             _lastAddress = address;
             _lastDevice = device;
+            _stopwatchTime.Restart();
         }
 
         public void Write(char address, char device, char dataH, char dataL)
@@ -55,6 +59,7 @@ namespace TargetControl
             _lastDevice = device;
             _lastDataH = dataH;
             _lastDataL = dataL;
+            _stopwatchTime.Restart();
         }
 
         public int? CheckPacket(string buf)
@@ -76,6 +81,7 @@ namespace TargetControl
                     return -1;
                 }
 
+                Console.WriteLine("took {0}ms", _stopwatchTime.ElapsedMilliseconds);
                 DataReceived(new SCIReadData
                 {
                     Address = buf[1],
@@ -100,6 +106,7 @@ namespace TargetControl
                     return -1;
                 }
 
+                Console.WriteLine("took {0}ms", _stopwatchTime.ElapsedMilliseconds);
                 DataReceived(new SCIReadData
                 {
                     Address = _lastAddress,

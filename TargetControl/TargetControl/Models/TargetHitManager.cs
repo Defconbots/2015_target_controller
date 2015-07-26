@@ -41,7 +41,7 @@ namespace TargetControl
 
             _serialInterface.DataReceived += OnInfoReceived;
 
-            _timer.Interval = TimeSpan.FromMilliseconds(100);
+            _timer.Interval = TimeSpan.FromMilliseconds(300);
             _timer.Tick += OnTimerTick;
             _timer.Start();
         }
@@ -135,11 +135,11 @@ namespace TargetControl
             {
                 Poll();
             }
+            _recvPacketLately = false;
         }
 
         private void Poll()
         {
-            _recvPacketLately = false;
             if (_speedCmd != _speedFb)
             {
                 var speed = _speedCmd == TargetSpeed.Stop ? "ST" :
@@ -187,7 +187,7 @@ namespace TargetControl
         public char Address { get; private set; }
         public bool RedLedCmd { get; set; }
         public bool BlueLedCmd { get; set; }
-        public bool RedLedFb { get; set; }
-        public bool BlueLedFb { get; set; }
+        public bool? RedLedFb { get; set; }
+        public bool? BlueLedFb { get; set; }
     }
 }

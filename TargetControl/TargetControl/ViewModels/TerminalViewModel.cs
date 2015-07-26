@@ -72,9 +72,9 @@ namespace TargetControl
 
         private void AddText(string serialData, bool isReceived)
         {
-            while (TerminalOutputText.Count > 20)
+            while (TerminalOutputText.Count > 50)
             {
-                TerminalOutputText.RemoveAt(0);
+                TerminalOutputText.Clear();
             }
 
             var last = TerminalOutputText.LastOrDefault();

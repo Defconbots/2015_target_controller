@@ -80,6 +80,8 @@
     </ApplicationDefinition>
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Controls\LockedToggleButton.cs" />
+    <Compile Include="Models\ContestModel.cs" />
+    <Compile Include="Models\Logger.cs" />
     <Compile Include="Models\SerialCommandInterface.cs" />
     <Compile Include="Models\SerialPacketParser.cs" />
     <Compile Include="Models\SerialPortSerial.cs" />

@@ -7,3 +7,5 @@ obj/
 _ReSharper*/
 *.crunchsolution.cache
 *.user
+
+*.DotSettings

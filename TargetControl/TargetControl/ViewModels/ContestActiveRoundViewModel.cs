@@ -10,11 +10,9 @@ namespace TargetControl
     public interface IContestActiveRoundViewModel : IContestStateMachineViewModel
     {
         TimeSpan ElapsedTime { get; }
-        Team Team { get; set; }
-        int NumberLives { get; set; }
-        int WaveNumber { get; set; }
-        int InitialScore { get; set; }
-        int InitialBestScore { get; set; }
+        Team Team { get; }
+        int NumberLives { get; }
+        int WaveNumber { get; }
         int TotalScore { get; }
         int WaveScore { get; }
         void Start();
@@ -23,13 +21,15 @@ namespace TargetControl
     public sealed class ContestActiveRoundViewModel : Screen, IContestActiveRoundViewModel
     {
         private readonly IContest _contest;
+        private readonly IContestModel _contestModel;
         private readonly ITimer _timer;
         private readonly Func<IContestPendingRoundViewModel> _pendingFunc;
         private readonly DateTime _startTime;
 
-        public ContestActiveRoundViewModel(IContest contest, ITimer timer, Func<IContestPendingRoundViewModel> pendingFunc)
+        public ContestActiveRoundViewModel(IContest contest, IContestModel contestModel, ITimer timer, Func<IContestPendingRoundViewModel> pendingFunc)
         {
             _contest = contest;
+            _contestModel = contestModel;
             _timer = timer;
             _pendingFunc = pendingFunc;
 
@@ -42,6 +42,7 @@ namespace TargetControl
             _timer.Start();
 
             _contest.WaveDataUpdated += RefreshTargets;
+            _contestModel.TeamInfoUpdated += OnTeamInfoUpdated;
         }
 
         public event Action<IContestStateMachineViewModel> ChangeState;
@@ -51,19 +52,24 @@ namespace TargetControl
             get { return DateTime.Now - _startTime; }
         }
 
-        public Team Team { get; set; }
+        public Team Team
+        {
+            get { return _contestModel.Team; }
+        }
 
-        public int NumberLives { get; set; }
+        public int NumberLives
+        {
+            get { return _contestModel.NumberLives; }
+        }
 
-        public int WaveNumber { get; set; }
-
-        public int InitialScore { get; set; }
-
-        public int InitialBestScore { get; set; }
+        public int WaveNumber
+        {
+            get { return _contestModel.WaveNumber; }
+        }
 
         public int TotalScore
         {
-            get { return InitialScore + _contest.WaveData.Score; }
+            get { return _contestModel.Score + _contest.WaveData.Score; }
         }
 
         public int WaveScore
@@ -73,7 +79,7 @@ namespace TargetControl
 
         public int MaxScore
         {
-            get { return Math.Max(InitialBestScore, TotalScore); }
+            get { return Math.Max(_contestModel.BestScore, TotalScore); }
         }
 
         public BindableCollection<ContestActiveRoundTargetViewModel> Targets { get; private set; }
@@ -92,16 +98,8 @@ namespace TargetControl
         {
             Stop();
 
-            if (Targets.All(x => x.Health == 0))
-            {
-                WaveNumber++;
-                InitialScore += _contest.WaveData.Score;
-            }
-            else
-            {
-                NumberLives--;
-                InitialBestScore = Math.Max(InitialBestScore, InitialScore + _contest.WaveData.Score);
-            }
+            var succeeded = Targets.All(x => x.Health == 0);
+            _contestModel.CompleteWave(succeeded, _contest.WaveData.Score);
 
             GoToPending();
         }
@@ -117,11 +115,6 @@ namespace TargetControl
             if (ChangeState != null)
             {
                 var vm = _pendingFunc();
-                vm.Team = Team;
-                vm.WaveNumber = WaveNumber;
-                vm.Score = InitialScore;
-                vm.BestScore = InitialBestScore;
-                vm.NumberLives = NumberLives;
                 ChangeState(vm);
             }
         }
@@ -129,6 +122,7 @@ namespace TargetControl
         private void Stop()
         {
             _timer.Stop();
+            _contest.Stop();
             _contest.WaveDataUpdated -= RefreshTargets;
         }
 
@@ -140,6 +134,13 @@ namespace TargetControl
                 Health = x.Health
             }));
 
+            NotifyOfPropertyChange(() => WaveScore);
+            NotifyOfPropertyChange(() => TotalScore);
+            NotifyOfPropertyChange(() => MaxScore);
+        }
+
+        private void OnTeamInfoUpdated()
+        {
             NotifyOfPropertyChange(() => WaveScore);
             NotifyOfPropertyChange(() => TotalScore);
             NotifyOfPropertyChange(() => MaxScore);

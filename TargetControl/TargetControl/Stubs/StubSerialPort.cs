@@ -15,7 +15,12 @@ namespace TargetControl
 
         public string ComPort { get; set; }
         public int BaudRate { get; set; }
-        public event Action<string> SerialDataSent;
+        public event Action<string> SerialDataSent
+        {
+            add { }
+            remove { }
+        }
+
         public event Action<string> SerialDataReceived;
 
         public void Open()

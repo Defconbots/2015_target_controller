@@ -58,17 +58,38 @@
 
     <controls:MetroWindow.RightWindowCommands>
         <controls:WindowCommands>
-            <Button cal:Message.Attach="Settings">
-                <StackPanel Orientation="Horizontal">
-                    <Rectangle Width="20" Height="20"
-                               Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
-                        <Rectangle.OpacityMask>
-                            <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_cogs}" />
-                        </Rectangle.OpacityMask>
-                    </Rectangle>
-                    <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="settings"/>
-                </StackPanel>
-            </Button>
+            <StackPanel Orientation="Horizontal">
+                <Grid Width="15" Height="15" Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Rectangle Fill="Blue" Grid.RowSpan="2" Grid.ColumnSpan="2"/>
+                    <Rectangle Fill="Yellow" Grid.Row="0" Grid.Column="1"/>
+                    <Rectangle Fill="Yellow" Grid.Row="1" Grid.Column="0"/>
+
+
+                    <Grid.RenderTransform>
+                        <RotateTransform Angle="{Binding DataReceivedM4}" CenterX="7.5" CenterY="7.5"/>
+                    </Grid.RenderTransform>
+                </Grid>
+                <Button cal:Message.Attach="Settings">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="20" Height="20"
+                                   Fill="{Binding RelativeSource={RelativeSource AncestorType=Button}, Path=Foreground}">
+                            <Rectangle.OpacityMask>
+                                <VisualBrush Stretch="Fill" Visual="{StaticResource appbar_cogs}" />
+                            </Rectangle.OpacityMask>
+                        </Rectangle>
+                        <TextBlock Margin="4 0 0 0" VerticalAlignment="Center" Text="settings"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
         </controls:WindowCommands>
     </controls:MetroWindow.RightWindowCommands>
 
