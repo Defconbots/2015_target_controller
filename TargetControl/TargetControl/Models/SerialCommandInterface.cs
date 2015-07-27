@@ -81,7 +81,7 @@ namespace TargetControl
                     return -1;
                 }
 
-                Console.WriteLine("took {0}ms", _stopwatchTime.ElapsedMilliseconds);
+                Console.WriteLine("took {0}ms (read)", _stopwatchTime.ElapsedMilliseconds);
                 DataReceived(new SCIReadData
                 {
                     Address = buf[1],
@@ -106,7 +106,7 @@ namespace TargetControl
                     return -1;
                 }
 
-                Console.WriteLine("took {0}ms", _stopwatchTime.ElapsedMilliseconds);
+                Console.WriteLine("took {0}ms(write)", _stopwatchTime.ElapsedMilliseconds);
                 DataReceived(new SCIReadData
                 {
                     Address = _lastAddress,

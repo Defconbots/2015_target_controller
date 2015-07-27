@@ -96,7 +96,7 @@ namespace TargetControl.Models
 
         public void SaveChanges()
         {
-            _log.Log("Team completed: {0} with score {1}\n", Team.Name, BestScore);
+            _log.Log("Team completed: {0} with score {1}", Team.Name, BestScore);
             _db.Update(db =>
             {
                 var team = db.Teams.FirstOrDefault(x => x.Guid == Team.Guid);

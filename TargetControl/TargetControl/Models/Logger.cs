@@ -17,8 +17,8 @@ namespace TargetControl.Models
     {
         public void Log(string format, object[] args)
         {
-            var formatted = string.Format(format, args);
-            File.AppendAllText("thing.log", formatted);
+            var formatted = string.Format(format, args) + Environment.NewLine;
+            File.AppendAllText("DEFCONBOTS.TXT", formatted);
         }
     }
 }
