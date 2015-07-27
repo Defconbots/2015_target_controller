@@ -53,6 +53,12 @@ namespace TargetControl
             get { return _contestModel.BestScore; }
         }
 
+        public bool IsFinal
+        {
+            get { return _contestModel.IsFinal; }
+            set { _contestModel.IsFinal = value; }
+        }
+
         public int NumberLives
         {
             get { return _contestModel.NumberLives; }

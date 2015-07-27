@@ -14,6 +14,7 @@ namespace TargetControl.Models
         int NumberLives { get; }
         int WaveNumber { get; }
         int BestScore { get; }
+        bool IsFinal { get; set; }
 
         event Action TeamInfoUpdated;
 
@@ -42,6 +43,7 @@ namespace TargetControl.Models
         public int NumberLives { get; private set; }
         public int WaveNumber { get; private set; }
         public int BestScore { get; private set; }
+        public bool IsFinal { get; set; }
 
         public event Action TeamInfoUpdated;
 
@@ -52,6 +54,7 @@ namespace TargetControl.Models
             WaveNumber = 1;
             Score = 0;
             BestScore = 0;
+            IsFinal = false;
             RaiseTeamInfoUpdated();
         }
 
@@ -102,9 +105,19 @@ namespace TargetControl.Models
                 var team = db.Teams.FirstOrDefault(x => x.Guid == Team.Guid);
                 if (team != null)
                 {
-                    if (BestScore > team.QualScore)
+                    if (IsFinal)
                     {
-                        team.QualScore = BestScore;
+                        if (BestScore > team.FinalScore)
+                        {
+                            team.FinalScore = BestScore;
+                        }
+                    }
+                    else
+                    {
+                        if (BestScore > team.QualScore)
+                        {
+                            team.QualScore = BestScore;
+                        }
                     }
                 }
             });
