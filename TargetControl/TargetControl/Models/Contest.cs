@@ -117,13 +117,13 @@ namespace TargetControl
 
         public void Stop()
         {
-            _targetHitManager.IsEnabled = false;
             _targetHitManager.SetSpeed(TargetSpeed.Stop);
             foreach (var target in WaveData.Targets)
             {
                 _targetHitManager.SetRedLed(target.Address, false);
                 _targetHitManager.SetBlueLed(target.Address, false);
             }
+            _targetHitManager.IsEnabled = false;
         }
 
         private void OnResetTick(object sender, EventArgs e)

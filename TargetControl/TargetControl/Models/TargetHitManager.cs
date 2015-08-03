@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows.Threading;
 
 namespace TargetControl
@@ -64,6 +65,9 @@ namespace TargetControl
                         target.RedLedFb = null;
                         target.BlueLedFb = null;
                     }
+
+                    Thread.Sleep(200);
+                    _serialInterface.Write('0', 'S', 'S', 'T');
                 }
             }
         }
@@ -93,9 +97,6 @@ namespace TargetControl
 
         private void OnInfoReceived(SCIReadData data)
         {
-            if (!IsEnabled)
-                return;
-
             _recvPacketLately = true;
 
             var target = _targets.FirstOrDefault(x => x.Address == data.Address);
@@ -131,7 +132,10 @@ namespace TargetControl
                             OnHit(data.Address, hitId, hitType);
                         }
 
-                        _serialInterface.Write(data.Address, data.Device, '0', '0');
+                        if (IsEnabled)
+                        {
+                            _serialInterface.Write(data.Address, data.Device, '0', '0');
+                        }
                         return;
                     }
                 }
