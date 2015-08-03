@@ -62,6 +62,7 @@
     <Compile Include="SerialCommandInterfaceTests.cs" />
     <Compile Include="SerialPacketParserTests.cs" />
     <Compile Include="StubTimer.cs" />
+    <Compile Include="TargetHitManagerTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

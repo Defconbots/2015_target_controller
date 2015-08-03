@@ -112,10 +112,12 @@ namespace TargetControl
         {
             _targetHitManager.SetSpeed(TargetSpeed.Normal);
             UpdateTargetsToNormal();
+            _targetHitManager.IsEnabled = true;
         }
 
         public void Stop()
         {
+            _targetHitManager.IsEnabled = false;
             _targetHitManager.SetSpeed(TargetSpeed.Stop);
             foreach (var target in WaveData.Targets)
             {

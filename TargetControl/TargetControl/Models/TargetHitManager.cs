@@ -8,6 +8,7 @@ namespace TargetControl
     public interface ITargetHitManager
     {
         event Action<char, string, TargetHitType> OnHit;
+        bool IsEnabled { get; set; }
         void SetRedLed(char address, bool state);
         void SetBlueLed(char address, bool state);
         void SetSpeed(TargetSpeed speed);
@@ -23,14 +24,15 @@ namespace TargetControl
     public class TargetHitManager : ITargetHitManager
     {
         private readonly ISerialCommandInterface _serialInterface;
-        private readonly DispatcherTimer _timer;
+        private readonly ITimer _timer;
         private readonly List<Target> _targets;
         private TargetSpeed _speedCmd;
-        private TargetSpeed _speedFb;
+        private TargetSpeed? _speedFb;
         private int _nextHitRead = 0;
         private bool _recvPacketLately;
+        private bool _isEnabled;
 
-        public TargetHitManager(ISerialCommandInterface serialInterface, DispatcherTimer timer)
+        public TargetHitManager(ISerialCommandInterface serialInterface, ITimer timer)
         {
             _serialInterface = serialInterface;
             _timer = timer;
@@ -47,6 +49,24 @@ namespace TargetControl
         }
 
         public event Action<char, string, TargetHitType> OnHit;
+
+        public bool IsEnabled
+        {
+            get { return _isEnabled; }
+            set
+            {
+                _isEnabled = value;
+                if (!value)
+                {
+                    _speedFb = null;
+                    foreach (var target in _targets)
+                    {
+                        target.RedLedFb = null;
+                        target.BlueLedFb = null;
+                    }
+                }
+            }
+        }
 
         public void SetSpeed(TargetSpeed speed)
         {
@@ -73,6 +93,9 @@ namespace TargetControl
 
         private void OnInfoReceived(SCIReadData data)
         {
+            if (!IsEnabled)
+                return;
+
             _recvPacketLately = true;
 
             var target = _targets.FirstOrDefault(x => x.Address == data.Address);
@@ -140,6 +163,9 @@ namespace TargetControl
 
         private void Poll()
         {
+            if (!IsEnabled)
+                return;
+
             if (_speedCmd != _speedFb)
             {
                 var speed = _speedCmd == TargetSpeed.Stop ? "ST" :
