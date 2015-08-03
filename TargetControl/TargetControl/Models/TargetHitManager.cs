@@ -120,8 +120,8 @@ namespace TargetControl
                 {
                     var speed = "" + data.DataH + data.DataL;
                     _speedFb = speed == "ST" ? TargetSpeed.Stop :
-                               speed == "F1" ? TargetSpeed.Fast : 
-                               speed == "F2" ? TargetSpeed.Normal :
+                               speed == "F1" ? TargetSpeed.Normal : 
+                               speed == "F2" ? TargetSpeed.Fast :
                                                TargetSpeed.Stop;
                 }
             }
