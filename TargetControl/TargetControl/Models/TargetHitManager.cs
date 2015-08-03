@@ -120,8 +120,8 @@ namespace TargetControl
                 {
                     var speed = "" + data.DataH + data.DataL;
                     _speedFb = speed == "ST" ? TargetSpeed.Stop :
-                               speed == "F1" ? TargetSpeed.Slow : 
-                               speed == "F2" ? TargetSpeed.Go :
+                               speed == "F1" ? TargetSpeed.Fast : 
+                               speed == "F2" ? TargetSpeed.Normal :
                                                TargetSpeed.Stop;
                 }
             }
@@ -143,8 +143,8 @@ namespace TargetControl
             if (_speedCmd != _speedFb)
             {
                 var speed = _speedCmd == TargetSpeed.Stop ? "ST" :
-                    _speedCmd == TargetSpeed.Slow ? "F1" :
-                    _speedCmd == TargetSpeed.Go ? "F2" : "";
+                    _speedCmd == TargetSpeed.Normal ? "F1" :
+                    _speedCmd == TargetSpeed.Fast ? "F2" : "";
                 _serialInterface.Write('0', 'S', speed[0], speed[1]);
                 return;
             }
@@ -173,8 +173,8 @@ namespace TargetControl
     public enum TargetSpeed
     {
         Stop,
-        Go,
-        Slow
+        Normal,
+        Fast
     }
 
     public class Target

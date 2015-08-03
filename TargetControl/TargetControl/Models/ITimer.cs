@@ -6,6 +6,7 @@ namespace TargetControl
     public interface ITimer
     {
         TimeSpan Interval { get; set; }
+        bool IsEnabled { get; set; }
         event EventHandler Tick;
 
         void Start();
@@ -31,6 +32,12 @@ namespace TargetControl
         {
             get { return _timer.Interval; }
             set { _timer.Interval = value; }
+        }
+
+        public bool IsEnabled
+        {
+            get { return _timer.IsEnabled; }
+            set { _timer.IsEnabled = value; }
         }
 
         public void Start()

@@ -43,19 +43,31 @@ namespace TargetControl
         private const int ScoreForHit = 100000;
         public const int NumTargets = 5;
 
-        private readonly ITargetHitManager _targetHitManager;
-        private readonly DispatcherTimer _resetTimer;
         private static readonly TimeSpan HitOffDelay = TimeSpan.FromSeconds(3);
+        private static readonly TimeSpan ResetSpeedDuration = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan TrainStopCooldown = TimeSpan.FromSeconds(30);
+
+        private readonly ITargetHitManager _targetHitManager;
+        private readonly ITimer _resetTimer;
+        private readonly ITimer _resetSpeedTimer;
+        private readonly ITimer _calledShotCooldownTimer;
         private string _teamId;
 
-        public Contest(ITargetHitManager targetManager, DispatcherTimer resetTimer)
+        public Contest(ITargetHitManager targetManager, ITimer resetTimer, ITimer resetSpeedTimer, ITimer calledShotCooldownTimer)
         {
-            _resetTimer = resetTimer;
             _targetHitManager = targetManager;
-
             _resetTimer = resetTimer;
+            _resetSpeedTimer = resetSpeedTimer;
+            _calledShotCooldownTimer = calledShotCooldownTimer;
+
             _resetTimer.Interval = HitOffDelay;
             _resetTimer.Tick += OnResetTick;
+
+            _resetSpeedTimer.Interval = ResetSpeedDuration;
+            _resetSpeedTimer.Tick += OnResetSpeedTick;
+
+            _calledShotCooldownTimer.Interval = TrainStopCooldown;
+            _calledShotCooldownTimer.Tick += OnCalledShotCooldownComplete;
 
             _targetHitManager.OnHit += OnHit;
 
@@ -98,7 +110,7 @@ namespace TargetControl
 
         public void Resume()
         {
-            _targetHitManager.SetSpeed(TargetSpeed.Go);
+            _targetHitManager.SetSpeed(TargetSpeed.Normal);
             UpdateTargetsToNormal();
         }
 
@@ -116,6 +128,17 @@ namespace TargetControl
         {
             UpdateTargetsToNormal();
             _resetTimer.Stop();
+        }
+
+        private void OnResetSpeedTick(object sender, EventArgs e)
+        {
+            _targetHitManager.SetSpeed(TargetSpeed.Normal);
+            _resetSpeedTimer.Stop();
+        }
+
+        private void OnCalledShotCooldownComplete(object sender, EventArgs e)
+        {
+            _calledShotCooldownTimer.Stop();
         }
 
         private void UpdateTargetsToNormal()
@@ -149,11 +172,26 @@ namespace TargetControl
                     if (hitType == TargetHitType.Miscalled)
                     {
                         WaveData.Score -= ScoreForMiscall;
+
+                        _targetHitManager.SetSpeed(TargetSpeed.Fast);
+                        _resetSpeedTimer.Start();
+                    }
+                    else if (hitType == TargetHitType.Called)
+                    {
+                        hitTarget.Health--;
+                        WaveData.Score += ScoreForCalledShot;
+
+                        if (!_calledShotCooldownTimer.IsEnabled)
+                        {
+                            _targetHitManager.SetSpeed(TargetSpeed.Stop);
+                            _resetSpeedTimer.Start();
+                            _calledShotCooldownTimer.Start();
+                        }
                     }
                     else
                     {
                         hitTarget.Health--;
-                        WaveData.Score += hitType == TargetHitType.Called ? ScoreForCalledShot : ScoreForHit;
+                        WaveData.Score += ScoreForHit;
                     }
                 }
                 else
